@@ -1,0 +1,35 @@
+name: vscode_for_android
+description: A new Flutter project.
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+version: 1.0.0+1
+environment:
+  sdk: ">=2.10.0 <3.0.0"
+
+dependencies:
+  flutter:
+    sdk: flutter
+  archive: ^3.1.2
+  dio: ^4.0.0
+  cupertino_icons: ^1.0.2
+  termare_pty:
+    git: https://github.com/Termare/termare_pty
+  pseudo_terminal_utils:
+    path: /Users/nightmare/Desktop/nightmare-space/pseudo_terminal_utils
+  global_repository:
+    git: https://github.com/nightmare-space/global_repository
+  termare_view:
+    git: https://github.com/Termare/termare_view
+  webview_flutter: ^2.0.12
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^1.0.0
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/
+
+
+dependency_overrides:
+  termare_pty:
+    path: /Users/nightmare/Desktop/termare-space/termare_pty
