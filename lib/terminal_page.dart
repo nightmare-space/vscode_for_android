@@ -5,6 +5,7 @@ import 'dart:ui';
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:global_repository/global_repository.dart';
 import 'package:pseudo_terminal_utils/pseudo_terminal_utils.dart';
 import 'package:termare_pty/termare_pty.dart';
@@ -12,9 +13,11 @@ import 'package:termare_view/termare_view.dart';
 import 'package:vscode_for_android/assets_utils.dart';
 import 'package:webview_flutter/webview_flutter.dart';
 
+import 'page_route_builder.dart';
+
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
 String lockFile = RuntimeEnvir.dataPath + '/cache/init_lock';
-String source='''
+String source = '''
 deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ hirsute main universe multiverse
 deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ hirsute-updates main universe multiverse
 deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ hirsute-security main universe multiverse
@@ -120,6 +123,8 @@ class TerminalPage extends StatefulWidget {
 
 class _TerminalPageState extends State<TerminalPage> {
   PseudoTerminal pseudoTerminal;
+  bool vsCodeStaring = false;
+  Widget webview;
   bool hasBash() {
     final File bashFile = File(RuntimeEnvir.binPath + '/bash');
     final bool exist = bashFile.existsSync();
@@ -143,6 +148,8 @@ class _TerminalPageState extends State<TerminalPage> {
   }
 
   Future<void> startVsCode(PseudoTerminal pseudoTerminal) async {
+    vsCodeStaring = true;
+    setState(() {});
     pseudoTerminal.write('''clear && start_vs_code\n''');
   }
 
@@ -156,18 +163,31 @@ class _TerminalPageState extends State<TerminalPage> {
       Log.w('event -> $event');
     });
     await completer.future;
-    SystemChrome.setEnabledSystemUIMode(
-      SystemUiMode.manual,
-      overlays: [],
+    webview = const Scaffold(
+      body: WebView(
+        initialUrl: 'http://127.0.0.1:8080',
+        javascriptMode: JavascriptMode.unrestricted,
+      ),
     );
-    Navigator.of(context).push(MaterialPageRoute(builder: (_) {
-      return const Scaffold(
-        body: WebView(
-          initialUrl: 'http://127.0.0.1:8080',
-          javascriptMode: JavascriptMode.unrestricted,
-        ),
+    setState(() {});
+    // Navigator.of(context).push(
+    //   CustomRoute(
+    //     const Scaffold(
+    //       body: WebView(
+    //         initialUrl: 'http://127.0.0.1:8080',
+    //         javascriptMode: JavascriptMode.unrestricted,
+    //       ),
+    //     ),
+    //   ),
+    // );
+    Future.delayed(const Duration(milliseconds: 2000), () {
+      vsCodeStaring = false;
+      SystemChrome.setEnabledSystemUIMode(
+        SystemUiMode.manual,
+        overlays: [],
       );
-    }));
+      setState(() {});
+    });
   }
 
   Future<void> initTerminal(TermareController controller) async {
@@ -259,9 +279,45 @@ class _TerminalPageState extends State<TerminalPage> {
         pseudoTerminal.write('\x03');
         return true;
       },
-      child: TermarePty(
-        controller: controller,
-        pseudoTerminal: pseudoTerminal,
+      child: Stack(
+        children: [
+          TermarePty(
+            controller: controller,
+            pseudoTerminal: pseudoTerminal,
+          ),
+          if (vsCodeStaring)
+            Material(
+              color: Colors.black,
+              child: Center(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SpinKitDualRing(
+                      color: Theme.of(context).primaryColor,
+                      size: 18.w,
+                      lineWidth: 2.w,
+                    ),
+                    const SizedBox(
+                      width: 8,
+                    ),
+                    const Text(
+                      'VS Code 启动中...',
+                      style: TextStyle(
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                        fontSize: 20,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ),
+          if (webview != null)
+            Opacity(
+              opacity: vsCodeStaring ? 0 : 1.0,
+              child: webview,
+            ),
+        ],
       ),
     );
   }
