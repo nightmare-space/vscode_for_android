@@ -21,7 +21,6 @@ dependencies:
     git: https://github.com/nightmare-space/global_repository
   termare_view:
     git: https://github.com/Termare/termare_view
-  webview_flutter: ^2.0.12
 dev_dependencies:
   flutter_test:
     sdk: flutter

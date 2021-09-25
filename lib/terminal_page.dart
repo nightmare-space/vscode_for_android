@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:io';
 import 'dart:ui';
-
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -11,9 +10,7 @@ import 'package:pseudo_terminal_utils/pseudo_terminal_utils.dart';
 import 'package:termare_pty/termare_pty.dart';
 import 'package:termare_view/termare_view.dart';
 import 'package:vscode_for_android/assets_utils.dart';
-import 'package:webview_flutter/webview_flutter.dart';
-
-import 'page_route_builder.dart';
+import 'plugin_util.dart';
 
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
 String lockFile = RuntimeEnvir.dataPath + '/cache/init_lock';
@@ -154,7 +151,7 @@ class _TerminalPageState extends State<TerminalPage> {
   }
 
   Future<void> vsCodeListien() async {
-    WebView.platform = SurfaceAndroidWebView();
+    // WebView.platform = SurfaceAndroidWebView();
     final Completer completer = Completer();
     pseudoTerminal.out.listen((event) {
       if (event.contains('http://0.0.0.0:8080')) {
@@ -163,12 +160,13 @@ class _TerminalPageState extends State<TerminalPage> {
       Log.w('event -> $event');
     });
     await completer.future;
-    webview = const Scaffold(
-      body: WebView(
-        initialUrl: 'http://127.0.0.1:8080',
-        javascriptMode: JavascriptMode.unrestricted,
-      ),
-    );
+    PlauginUtil.openWebView();
+    // webview = const Scaffold(
+    //   body: WebView(
+    //     initialUrl: 'http://127.0.0.1:8080',
+    //     javascriptMode: JavascriptMode.unrestricted,
+    //   ),
+    // );
     setState(() {});
     // Navigator.of(context).push(
     //   CustomRoute(
