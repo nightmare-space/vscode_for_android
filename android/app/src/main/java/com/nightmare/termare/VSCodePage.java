@@ -27,6 +27,7 @@ import io.flutter.plugin.platform.PlatformPlugin;
 public class VSCodePage extends Activity {
     WebView mWebView;
     Activity context;
+
     @SuppressLint("SetJavaScriptEnabled")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -40,7 +41,7 @@ public class VSCodePage extends Activity {
 //            window.getDecorView().setSystemUiVisibility(PlatformPlugin.DEFAULT_SYSTEM_UI);
 //        }
         //获得控件
-        context=this;
+        context = this;
         mWebView = (WebView) findViewById(R.id.wv_webview);
         //访问网页
         WebSettings mWebSettings = mWebView.getSettings();
@@ -67,7 +68,6 @@ public class VSCodePage extends Activity {
                 //返回true
                 return true;
             }
-
         });
         mWebView.loadUrl("http://127.0.0.1:8080");
     }
