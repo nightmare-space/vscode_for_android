@@ -7,7 +7,7 @@ packages:
       name: archive
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.1.5"
+    version: "3.1.6"
   async:
     dependency: transitive
     description:
@@ -69,7 +69,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "407708bf4c834b6359aba224675b16e91b711a28"
+      resolved-ref: "2b287536a9037c30f1c44952fa4f669db8e496e4"
       url: "https://github.com/Termare/dart_pty"
     source: git
     version: "0.0.3"
@@ -79,7 +79,7 @@ packages:
       name: dio
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.0.0"
+    version: "4.0.1"
   event_bus:
     dependency: transitive
     description:
@@ -137,7 +137,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "3917e366a3c366516d353830105f7e0fab4f0d91"
+      resolved-ref: "7e9209e4485efccd1377c1c8e74692096584b4b9"
       url: "https://github.com/nightmare-space/global_repository"
     source: git
     version: "0.0.1"
@@ -189,7 +189,7 @@ packages:
       name: permission_handler_platform_interface
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.6.2"
+    version: "3.7.0"
   plugin_platform_interface:
     dependency: transitive
     description:
@@ -210,7 +210,7 @@ packages:
       name: quiver
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "3.0.1"
+    version: "3.0.1+1"
   signale:
     dependency: transitive
     description:
@@ -253,6 +253,13 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.1.0"
+  synchronized:
+    dependency: transitive
+    description:
+      name: synchronized
+      url: "https://pub.flutter-io.cn"
+    source: hosted
+    version: "3.0.0"
   term_glyph:
     dependency: transitive
     description:
@@ -272,7 +279,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "558e38e2b810c0d783422ebbdadd4beaa949a30f"
+      resolved-ref: "6a82187d1f7f47f0568fe457f6ff3d24e57ddc0e"
       url: "https://github.com/Termare/termare_view"
     source: git
     version: "0.0.7"
@@ -303,7 +310,7 @@ packages:
       name: win32
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.2.9"
+    version: "2.2.10"
 sdks:
   dart: ">=2.14.0 <3.0.0"
   flutter: ">=2.5.0"
