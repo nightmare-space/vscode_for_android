@@ -30,7 +30,7 @@
         <activity
             android:name="com.nightmare.termare.VSCodePage"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
-            android:theme="@android:style/Theme.NoTitleBar.Fullscreen" />
+            android:theme="@style/WebTheme" />
 
         <meta-data
             android:name="flutterEmbedding"
