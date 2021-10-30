@@ -5,7 +5,7 @@ import 'package:global_repository/global_repository.dart';
 import 'terminal_page.dart';
 
 void main() {
-  RuntimeEnvir.initEnvirWithPackageName('com.nightmare.termare');
+  RuntimeEnvir.initEnvirWithPackageName('com.nightmare.code');
   runApp(const MyApp());
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

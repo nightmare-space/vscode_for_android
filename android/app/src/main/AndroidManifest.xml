@@ -1,6 +1,6 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.nightmare.termare">
+    package="com.nightmare.code">
 
     <uses-permission android:name="android.permission.INTERNET" />
     <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
@@ -28,7 +28,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.nightmare.termare.VSCodePage"
+            android:name="com.nightmare.code.VSCodePage"
             android:configChanges="orientation|screenSize|keyboard|keyboardHidden"
             android:theme="@style/WebTheme" />
 
