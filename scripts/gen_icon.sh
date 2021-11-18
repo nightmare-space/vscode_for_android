@@ -1,0 +1,1 @@
+sips -z 128 128 ic_launcher.png --out icon_16x16.png

@@ -53,7 +53,7 @@ install_ubuntu(){
   cd ~
   colorEcho - 安装Ubuntu Linux
   unzip proot-distro.zip >/dev/null
-  cd ~/proot-distro
+  #cd ~/proot-distro
   bash ./install.sh
   apt-get install -y proot
   proot-distro install ubuntu
