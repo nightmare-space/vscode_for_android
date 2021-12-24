@@ -16,7 +16,7 @@ dependencies:
   termare_pty:
     git: https://github.com/Termare/termare_pty
   pseudo_terminal_utils:
-    path: /Users/nightmare/Desktop/nightmare-space/pseudo_terminal_utils
+    git: https://github.com/Termare/pseudo_terminal_utils.git
   global_repository:
     git: https://github.com/nightmare-space/global_repository
   termare_view:

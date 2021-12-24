@@ -14,7 +14,7 @@ packages:
       name: async
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.8.1"
+    version: "2.8.2"
   boolean_selector:
     dependency: transitive
     description:
@@ -28,7 +28,7 @@ packages:
       name: characters
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.1.0"
+    version: "1.2.0"
   charcode:
     dependency: transitive
     description:
@@ -63,13 +63,13 @@ packages:
       name: cupertino_icons
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.3"
+    version: "1.0.4"
   dart_pty:
     dependency: transitive
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "2b287536a9037c30f1c44952fa4f669db8e496e4"
+      resolved-ref: "780ac18a3da379a6166787739e73fa4d86c39b22"
       url: "https://github.com/Termare/dart_pty"
     source: git
     version: "0.0.3"
@@ -79,7 +79,7 @@ packages:
       name: dio
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.0.1"
+    version: "4.0.4"
   event_bus:
     dependency: transitive
     description:
@@ -131,13 +131,13 @@ packages:
       name: get
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "4.3.8"
+    version: "4.6.1"
   global_repository:
     dependency: "direct main"
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "7e9209e4485efccd1377c1c8e74692096584b4b9"
+      resolved-ref: "8ae0e1b004241124cad124a1a343fa07a4acf279"
       url: "https://github.com/nightmare-space/global_repository"
     source: git
     version: "0.0.1"
@@ -161,7 +161,7 @@ packages:
       name: matcher
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.12.10"
+    version: "0.12.11"
   meta:
     dependency: transitive
     description:
@@ -200,9 +200,11 @@ packages:
   pseudo_terminal_utils:
     dependency: "direct main"
     description:
-      path: "/Users/nightmare/Desktop/nightmare-space/pseudo_terminal_utils"
-      relative: false
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "55877213cc41e71b065a4aba5e6b33c847e6bd59"
+      url: "https://github.com/Termare/pseudo_terminal_utils.git"
+    source: git
     version: "0.0.1"
   quiver:
     dependency: transitive
@@ -216,8 +218,8 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: c64399b18aa1427c9366bec41662f9d240cc9eda
-      url: "https://github.com/Nightmare-MY/signale"
+      resolved-ref: "99e278923e468ca882dd13208255fd0944ad5da3"
+      url: "https://github.com/nightmare-space/signale"
     source: git
     version: "0.0.6"
   sky_engine:
@@ -279,7 +281,7 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: "6a82187d1f7f47f0568fe457f6ff3d24e57ddc0e"
+      resolved-ref: "1d2e49d18f042e1c4ea55fedcda1d096622d1ad0"
       url: "https://github.com/Termare/termare_view"
     source: git
     version: "0.0.7"
@@ -289,7 +291,7 @@ packages:
       name: test_api
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.4.2"
+    version: "0.4.3"
   typed_data:
     dependency: transitive
     description:
@@ -303,14 +305,14 @@ packages:
       name: vector_math
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.1.0"
+    version: "2.1.1"
   win32:
     dependency: transitive
     description:
       name: win32
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.2.10"
+    version: "2.3.3"
 sdks:
   dart: ">=2.14.0 <3.0.0"
   flutter: ">=2.5.0"
