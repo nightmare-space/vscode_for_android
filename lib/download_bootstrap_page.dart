@@ -63,7 +63,7 @@ class _DownloadFileState extends State<_DownloadFile> {
         '0777',
         savePath,
       ],
-      environment: PlatformUtil.environment(),
+      environment: RuntimeEnvir.envir(),
     );
     Log.e(result.stderr);
     Log.d(result.stdout);
