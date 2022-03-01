@@ -11,7 +11,7 @@ import 'package:termare_pty/termare_pty.dart';
 import 'package:termare_view/termare_view.dart';
 import 'plugin_util.dart';
 
-String version = '3.12.0';
+String version = '4.0.1';
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
 String ubuntuPath = '$prootDistroPath/installed-rootfs/ubuntu';
 String lockFile = RuntimeEnvir.dataPath + '/cache/init_lock';
