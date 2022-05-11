@@ -69,7 +69,7 @@ public class VSCodePage extends Activity {
                 return true;
             }
         });
-        mWebView.loadUrl("http://127.0.0.1:8080");
+        mWebView.loadUrl("http://127.0.0.1:10000");
     }
 
 

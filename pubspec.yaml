@@ -15,6 +15,11 @@ dependencies:
   cupertino_icons: ^1.0.2
   termare_pty:
     git: https://github.com/Termare/termare_pty
+
+  pty:
+    git: https://github.com/TerminalStudio/pty
+  xterm:
+    path: /Users/nightmare/Desktop/TerminalStudio/xterm.dart
   pseudo_terminal_utils:
     git: https://github.com/Termare/pseudo_terminal_utils.git
   global_repository:
