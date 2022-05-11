@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <style name="LaunchTheme" parent="NormalTheme">
+        <!-- All customizations that are NOT specific to a particular API-level can go here. -->
+        <!-- 隐藏状态栏 -->
+        <item name="android:windowFullscreen">true</item>
+
+        <!-- 隐藏标题栏 -->
+        <item name="android:windowNoTitle">true</item>
+        <item name="android:windowTranslucentStatus">true</item>
+        <item name="android:windowContentOverlay">@null</item>
+        <item name="android:windowLayoutInDisplayCutoutMode">shortEdges</item>
+    </style>
+</resources>

@@ -1,0 +1,56 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [{
+            "name": "Linux",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "linux"
+        },
+        {
+            "name": "Chrome",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "chrome",
+            "args": ["--web-renderer","html"]
+        },
+        {
+            "name": "Mac Desktop",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "macos"
+        },
+        {
+            "name": "Windows Desktop",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "windows"
+        },
+        {
+            "name": "平板",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "M2105K81AC"
+        },
+        {
+            "name": "小米10",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "Mi 10"
+        },
+        {
+            "name": "小米10s",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "M2102J2SC"
+        },
+        {
+            "name": "红米K30",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "Redmi K30"
+        },
+    ]
+}
