@@ -2,6 +2,8 @@
 // code-server版本号
 import 'package:global_repository/global_repository.dart';
 
+import 'config.dart';
+
 String version = '4.4.0';
 // prootDistro 路径
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
@@ -41,7 +43,7 @@ colorEcho(){
 //   yarn install
 // }
 // ''';
-
+/// 安装ubuntu的shell
 String installUbuntu = '''
 install_ubuntu(){
   cd ~
@@ -56,19 +58,27 @@ install_ubuntu(){
 }
 ''';
 
+/// 安装code-server的脚本
 String installVsCodeScript = '''
 $colorEcho
 install_vs_code(){
   if [ ! -d "$ubuntuPath/home/code-server-$version-linux-arm64" ];then
     cd $ubuntuPath/home
+    server_path="/sdcard/code-server-$version-linux-arm64.tar.gz"
+    if [ ! -d "\$server_path" ];then
+      dart_dio \\
+      https://nightmare-my.oss-cn-beijing.aliyuncs.com/code-server-4.4.0-linux-arm64.tar.gz \\
+      /sdcard/code-server-4.4.0-linux-arm64.tar.gz
+    fi
     colorEcho - 解压 Vs Code Arm64
-    tar zxvfh /sdcard/code-server-$version-linux-arm64.tar.gz >/dev/null 2>/sdcard/logggg.txt
+    tar zxvfh \$server_path
     cd code-server-$version-linux-arm64
   fi
 }
 ''';
 
 // TODO 加上端口的kill
+/// 启动 vs code 的shell
 String startVsCodeScript = '''
 $installVsCodeScript
 start_vs_code(){
@@ -84,10 +94,12 @@ start_vs_code(){
   proot-distro login ubuntu -- /home/code-server-$version-linux-arm64/bin/code-server
 }
 ''';
+
 String getRedLog(String data) {
   return '\x1b[31m$data\x1b[0m';
 }
 
+/// 初始化类Linux环境的shell
 String initShell = '''
 $installUbuntu
 $startVsCodeScript
