@@ -1,13 +1,17 @@
 import 'dart:async';
+import 'dart:convert';
 import 'dart:io';
 import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:flutter_pty/flutter_pty.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:global_repository/global_repository.dart';
-import 'package:pty/pty.dart';
+import 'package:vscode_for_android/utils/extension.dart';
 import 'package:xterm/next.dart';
-import 'plugin_util.dart';
+import 'config.dart';
+import 'http_handler.dart';
+import 'utils/plugin_util.dart';
 import 'script.dart';
 import 'xterm_wrapper.dart';
 
@@ -15,24 +19,20 @@ class TerminalPage extends StatefulWidget {
   const TerminalPage({Key key}) : super(key: key);
 
   @override
-  _TerminalPageState createState() => _TerminalPageState();
+  State<TerminalPage> createState() => _TerminalPageState();
 }
 
 class _TerminalPageState extends State<TerminalPage> {
+  // 环境变量
   Map<String, String> envir;
-  PseudoTerminal pseudoTerminal;
+  Pty pseudoTerminal;
   bool vsCodeStaring = false;
   Terminal terminal = Terminal();
-  bool hasBash() {
-    final File bashFile = File(RuntimeEnvir.binPath + '/bash');
-    final bool exist = bashFile.existsSync();
-    return exist;
-  }
 
-  bool currentVSExist() {
-    final File codeServer = File(
-        '$prootDistroPath/installed-rootfs/ubuntu/home/code-server-$version-linux-arm64/code-server');
-    final bool exist = codeServer.existsSync();
+  // 是否存在bash文件
+  bool hasBash() {
+    final File bashFile = File('${RuntimeEnvir.binPath}/bash');
+    final bool exist = bashFile.existsSync();
     return exist;
   }
 
@@ -48,42 +48,57 @@ class _TerminalPageState extends State<TerminalPage> {
     if (File('${RuntimeEnvir.usrPath}/lib/libtermux-exec.so').existsSync()) {
       envir['LD_PRELOAD'] = '${RuntimeEnvir.usrPath}/lib/libtermux-exec.so';
     }
+    Directory(RuntimeEnvir.binPath).createSync(
+      recursive: true,
+    );
+    String dioPath = '${RuntimeEnvir.binPath}/dart_dio';
+    File(dioPath).writeAsStringSync(Config.dioScript);
+    await exec('chmod +x $dioPath');
     if (Platform.isAndroid) {
       if (!hasBash()) {
         // 初始化后 bash 应该存在
         initTerminal();
         return;
       }
-      // if (!currentVSExist()) {
-      //   // 升级策略
-      //   await copyVSCodeAsset();
-      // }
     }
-    pseudoTerminal = PseudoTerminal.start(
-      RuntimeEnvir.binPath + '/bash',
-      [],
-      blocking: false,
+    pseudoTerminal = Pty.start(
+      '${RuntimeEnvir.binPath}/bash',
+      arguments: [],
       environment: envir,
       workingDirectory: RuntimeEnvir.homePath,
-    )..init();
+    );
     Future.delayed(const Duration(milliseconds: 300), () {
-      pseudoTerminal.write(startVsCodeScript);
+      pseudoTerminal.writeString(startVsCodeScript);
       startVsCode(pseudoTerminal);
     });
     setState(() {});
     vsCodeStartWhenSuccessBind();
   }
 
-  Future<void> startVsCode(PseudoTerminal pseudoTerminal) async {
+  Future<void> startVsCode(Pty pseudoTerminal) async {
     vsCodeStaring = true;
     setState(() {});
-    pseudoTerminal.write('''start_vs_code\n''');
+    pseudoTerminal.writeString('''start_vs_code\n''');
   }
 
   Future<void> vsCodeStartWhenSuccessBind() async {
     // WebView.platform = SurfaceAndroidWebView();
     final Completer completer = Completer();
-    pseudoTerminal.out.asBroadcastStream().listen((event) {
+    pseudoTerminal.output
+        .cast<List<int>>()
+        .transform(const Utf8Decoder())
+        .listen((event) {
+      final List<String> list = event.split(RegExp('\x0d|\x0a'));
+      final String lastLine = list.last.trim();
+      if (lastLine.startsWith(RegExp('dart_dio'))) {
+        String data = event.replaceAll(RegExp('dart_dio.*'), '');
+        terminal.write(data);
+        HttpHandler.handDownload(
+          controller: terminal,
+          cmdLine: list.last,
+        );
+        return;
+      }
       if (event.contains('http://0.0.0.0:10000')) {
         completer.complete();
       }
@@ -93,8 +108,6 @@ class _TerminalPageState extends State<TerminalPage> {
       event.split('').forEach((element) {
         terminal.write(element);
       });
-
-      // Log.w('event -> $event');
     });
     await completer.future;
     PlauginUtil.openWebView();
@@ -110,16 +123,16 @@ class _TerminalPageState extends State<TerminalPage> {
   }
 
   Future<void> initTerminal() async {
-    pseudoTerminal = PseudoTerminal.start(
+    pseudoTerminal = Pty.start(
       '/system/bin/sh',
-      [],
-      blocking: false,
+      arguments: [],
       environment: envir,
-    )..init();
+      workingDirectory: RuntimeEnvir.homePath,
+    );
 
     vsCodeStartWhenSuccessBind();
-    await Future.delayed(Duration(milliseconds: 300));
-    pseudoTerminal.write(
+    await Future.delayed(const Duration(milliseconds: 300));
+    pseudoTerminal.writeString(
       initShell,
     );
     setState(() {});
@@ -129,11 +142,11 @@ class _TerminalPageState extends State<TerminalPage> {
     Directory(RuntimeEnvir.homePath).createSync(recursive: true);
     await AssetsUtils.copyAssetToPath(
       'assets/bootstrap-aarch64.zip',
-      RuntimeEnvir.tmpPath + '/bootstrap-aarch64.zip',
+      '${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip',
     );
     await AssetsUtils.copyAssetToPath(
       'assets/proot-distro.zip',
-      RuntimeEnvir.homePath + '/proot-distro.zip',
+      '${RuntimeEnvir.homePath}/proot-distro.zip',
     );
     Directory('$prootDistroPath/dlcache').createSync(
       recursive: true,
@@ -142,8 +155,8 @@ class _TerminalPageState extends State<TerminalPage> {
       'assets/ubuntu-aarch64-pd-v2.3.1.tar.xz',
       '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v2.3.1.tar.xz',
     );
-    await unzipBootstrap(RuntimeEnvir.tmpPath + '/bootstrap-aarch64.zip');
-    pseudoTerminal.write('initApp\n');
+    await unzipBootstrap('${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip');
+    pseudoTerminal.writeString('initApp\n');
   }
 
   Future<void> unzipBootstrap(String modulePath) async {
@@ -189,7 +202,7 @@ class _TerminalPageState extends State<TerminalPage> {
     }
     return WillPopScope(
       onWillPop: () async {
-        pseudoTerminal.write('\x03');
+        pseudoTerminal.writeString('\x03');
         return true;
       },
       child: Stack(

@@ -49,7 +49,7 @@ packages:
       name: collection
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.15.0"
+    version: "1.16.0"
   convert:
     dependency: transitive
     description:
@@ -107,14 +107,14 @@ packages:
       name: fake_async
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.2.0"
+    version: "1.3.0"
   ffi:
     dependency: transitive
     description:
       name: ffi
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.1.2"
+    version: "1.2.1"
   flutter:
     dependency: "direct main"
     description: flutter
@@ -126,7 +126,16 @@ packages:
       name: flutter_lints
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.4"
+    version: "2.0.1"
+  flutter_pty:
+    dependency: "direct main"
+    description:
+      path: "."
+      ref: HEAD
+      resolved-ref: a7cec894532226910ef79873f4c9555cf0a6a17c
+      url: "https://github.com/TerminalStudio/flutter_pty"
+    source: git
+    version: "0.2.0"
   flutter_spinkit:
     dependency: "direct main"
     description:
@@ -168,7 +177,7 @@ packages:
       name: lints
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.0.1"
+    version: "2.0.0"
   matcher:
     dependency: transitive
     description:
@@ -182,7 +191,7 @@ packages:
       name: material_color_utilities
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.1.3"
+    version: "0.1.4"
   meta:
     dependency: transitive
     description:
@@ -196,7 +205,7 @@ packages:
       name: path
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.8.0"
+    version: "1.8.1"
   permission_handler:
     dependency: transitive
     description:
@@ -225,24 +234,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.2"
-  pseudo_terminal_utils:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "90d635ced306dc4237171da20ce497fd12134902"
-      url: "https://github.com/Termare/pseudo_terminal_utils.git"
-    source: git
-    version: "0.0.1"
-  pty:
-    dependency: "direct main"
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "5c3798fef3f304316a8c8b8b66d611c944213dac"
-      url: "https://github.com/TerminalStudio/pty"
-    source: git
-    version: "0.2.2-pre"
   quiver:
     dependency: transitive
     description:
@@ -268,7 +259,7 @@ packages:
       name: source_span
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "1.8.1"
+    version: "1.8.2"
   stack_trace:
     dependency: transitive
     description:
@@ -305,14 +296,14 @@ packages:
     source: hosted
     version: "1.2.0"
   termare_pty:
-    dependency: "direct main"
+    dependency: "direct overridden"
     description:
       path: "/Users/nightmare/Desktop/termare-space/termare_pty"
       relative: false
     source: path
     version: "1.0.0+1"
   termare_view:
-    dependency: "direct main"
+    dependency: transitive
     description:
       path: "."
       ref: HEAD
@@ -326,7 +317,7 @@ packages:
       name: test_api
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "0.4.8"
+    version: "0.4.9"
   typed_data:
     dependency: transitive
     description:
@@ -340,7 +331,7 @@ packages:
       name: vector_math
       url: "https://pub.flutter-io.cn"
     source: hosted
-    version: "2.1.1"
+    version: "2.1.2"
   win32:
     dependency: transitive
     description:
@@ -351,10 +342,10 @@ packages:
   xterm:
     dependency: "direct main"
     description:
-      path: "/Users/nightmare/Desktop/TerminalStudio/xterm.dart"
-      relative: false
+      path: "../xterm"
+      relative: true
     source: path
     version: "3.0.6-alpha"
 sdks:
-  dart: ">=2.15.0 <3.0.0"
-  flutter: ">=2.5.0"
+  dart: ">=2.17.0-206.0.dev <3.0.0"
+  flutter: ">=2.12.0"

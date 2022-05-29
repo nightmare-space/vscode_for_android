@@ -1,11 +1,11 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_pty/flutter_pty.dart';
 import 'package:get/utils.dart';
-import 'package:pty/pty.dart';
+import 'package:vscode_for_android/utils/extension.dart';
 import 'package:xterm/next.dart';
 import 'package:xterm/next/ui/terminal_theme.dart';
-import 'package:xterm/next/ui/themes.dart';
 
 class XTermWrapper extends StatefulWidget {
   const XTermWrapper({
@@ -14,7 +14,7 @@ class XTermWrapper extends StatefulWidget {
     this.pseudoTerminal,
   }) : super(key: key);
   final Terminal terminal;
-  final PseudoTerminal pseudoTerminal;
+  final Pty pseudoTerminal;
 
   @override
   State<XTermWrapper> createState() => _XTermWrapperState();
@@ -26,15 +26,8 @@ class _XTermWrapperState extends State<XTermWrapper> {
   @override
   void initState() {
     super.initState();
-    // print('$this init');
-    // print('\x1b[31m监听的id 为${pseudoTerminal.pseudoTerminalId}');
-    // 延时有用，是termare_app引起的。
-    // PageView.builder会在短时间init与dispose这个widget
-    // if (!mounted) {
-    //   return;
-    // }
     widget.terminal.onOutput = (data) {
-      widget.pseudoTerminal.write(data);
+      widget.pseudoTerminal.writeString(data);
     };
 
     widget.terminal.onResize = (width, height, pixelWidth, pixelHeight) {
