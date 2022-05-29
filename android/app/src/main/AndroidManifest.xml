@@ -14,7 +14,7 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name="com.nightmare.code.VSCodePage" android:configChanges="orientation|keyboardHidden|keyboard|screenSize|smallestScreenSize|locale|layoutDirection|fontScale|screenLayout|density|uiMode" android:theme="@style/LaunchTheme" android:screenOrientation="sensor" />
+        <activity android:name="com.nightmare.code.VSCodePage" android:configChanges="orientation|screenSize|keyboard|keyboardHidden" android:theme="@style/LaunchTheme" />
 
         <meta-data android:name="flutterEmbedding" android:value="2" />
     </application>
