@@ -25,7 +25,10 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
-      home: const TerminalPage(),
+      home: const Scaffold(
+        backgroundColor: Colors.transparent,
+        body: TerminalPage(),
+      ),
     );
   }
 }
