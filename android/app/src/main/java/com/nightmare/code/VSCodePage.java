@@ -3,12 +3,15 @@ package com.nightmare.code;
 import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.database.ContentObserver;
 import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Message;
+import android.provider.Settings;
 import android.util.Log;
 import android.view.Window;
 import android.view.WindowManager;
@@ -27,6 +30,7 @@ import io.flutter.plugin.platform.PlatformPlugin;
 public class VSCodePage extends Activity {
     WebView mWebView;
     Activity context;
+    MyOrientoinListener myOrientoinListener;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -34,12 +38,18 @@ public class VSCodePage extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.webview);
-//        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-//            Window window = getWindow();
-//            window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-//            window.setStatusBarColor(0x40000000);
-//            window.getDecorView().setSystemUiVisibility(PlatformPlugin.DEFAULT_SYSTEM_UI);
-//        }
+        myOrientoinListener = new MyOrientoinListener(this);
+        checkState();
+        getContentResolver().registerContentObserver(
+                Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION),
+                true,
+                new ContentObserver(new Handler()) {
+                    @Override
+                    public void onChange(boolean selfChange) {
+                        checkState();
+                    }
+                }
+        );
         //获得控件
         context = this;
         mWebView = (WebView) findViewById(R.id.wv_webview);
@@ -72,6 +82,15 @@ public class VSCodePage extends Activity {
         mWebView.loadUrl("http://127.0.0.1:10000");
     }
 
+    void checkState() {
+        boolean autoRotateOn = (android.provider.Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1);
+        //检查系统是否开启自动旋转
+        if (autoRotateOn) {
+            myOrientoinListener.enable();
+        } else {
+            myOrientoinListener.disable();
+        }
+    }
 
     WebChromeClient webChromeClient = new WebChromeClient() {
 
@@ -95,4 +114,17 @@ public class VSCodePage extends Activity {
         //=========多窗口的问题==========================================================
     };
 
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        //销毁时取消监听
+        myOrientoinListener.disable();
+    }
+
+    private ContentObserver mAutoTimeObserver = new ContentObserver(new Handler()) {
+        @Override
+        public void onChange(boolean selfChange) {
+
+        }
+    };
 }
