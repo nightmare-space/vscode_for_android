@@ -15,7 +15,7 @@ dependencies:
   cupertino_icons: ^1.0.2
   xterm:
     git:
-      url: https://github.com/TerminalStudio/xterm.dart
+      url: https://github.com/mengyanshou/xterm.dart
       ref: v3
   flutter_pty:
     git: https://github.com/TerminalStudio/flutter_pty
@@ -31,8 +31,4 @@ flutter:
     - assets/
 
 
-dependency_overrides:
-  termare_pty:
-    path: /Users/nightmare/Desktop/termare-space/termare_pty
-  xterm:
-    path: ../xterm
+# dependency_overrides:
