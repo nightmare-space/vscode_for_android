@@ -71,15 +71,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.0.5"
-  dart_pty:
-    dependency: transitive
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: a437347d882e8e9110564cef9495f8dafc6c8b89
-      url: "https://github.com/Termare/dart_pty"
-    source: git
-    version: "0.0.3"
   dio:
     dependency: "direct main"
     description:
@@ -94,13 +85,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.0.3"
-  event_bus:
-    dependency: transitive
-    description:
-      name: event_bus
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "1.1.1"
   fake_async:
     dependency: transitive
     description:
@@ -132,10 +116,10 @@ packages:
     description:
       path: "."
       ref: HEAD
-      resolved-ref: a7cec894532226910ef79873f4c9555cf0a6a17c
+      resolved-ref: cbac41844c0e83e856119b20a56f5b66f01fde5e
       url: "https://github.com/TerminalStudio/flutter_pty"
     source: git
-    version: "0.2.0"
+    version: "0.3.0"
   flutter_spinkit:
     dependency: "direct main"
     description:
@@ -148,19 +132,12 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
-  get:
-    dependency: transitive
-    description:
-      name: get
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "4.6.5"
   global_repository:
     dependency: "direct main"
     description:
       path: "."
       ref: HEAD
-      resolved-ref: b46407d0627768b9883265536de87826beb389e6
+      resolved-ref: "5c3a8bda531ce429968179cb489ecd8e6141d479"
       url: "https://github.com/nightmare-space/global_repository"
     source: git
     version: "0.0.1"
@@ -295,22 +272,6 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "1.2.0"
-  termare_pty:
-    dependency: "direct overridden"
-    description:
-      path: "/Users/nightmare/Desktop/termare-space/termare_pty"
-      relative: false
-    source: path
-    version: "1.0.0+1"
-  termare_view:
-    dependency: transitive
-    description:
-      path: "."
-      ref: HEAD
-      resolved-ref: "1d2e49d18f042e1c4ea55fedcda1d096622d1ad0"
-      url: "https://github.com/Termare/termare_view"
-    source: git
-    version: "0.0.7"
   test_api:
     dependency: transitive
     description:
@@ -332,20 +293,15 @@ packages:
       url: "https://pub.flutter-io.cn"
     source: hosted
     version: "2.1.2"
-  win32:
-    dependency: transitive
-    description:
-      name: win32
-      url: "https://pub.flutter-io.cn"
-    source: hosted
-    version: "2.6.1"
   xterm:
     dependency: "direct main"
     description:
-      path: "../xterm"
-      relative: true
-    source: path
+      path: "."
+      ref: v3
+      resolved-ref: dc16176a04d0f2782d21aba257760bb8c8d5a9de
+      url: "https://github.com/mengyanshou/xterm.dart"
+    source: git
     version: "3.0.6-alpha"
 sdks:
-  dart: ">=2.17.0 <3.0.0"
+  dart: ">=2.17.0-206.0.dev <3.0.0"
   flutter: ">=2.12.0"
