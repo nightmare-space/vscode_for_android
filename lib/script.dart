@@ -2,14 +2,13 @@
 // code-server版本号
 import 'package:global_repository/global_repository.dart';
 
-import 'config.dart';
 
-String version = '4.4.0';
+String version = '4.5.0';
 // prootDistro 路径
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
 // ubuntu 路径
 String ubuntuPath = '$prootDistroPath/installed-rootfs/ubuntu';
-String lockFile = RuntimeEnvir.dataPath + '/cache/init_lock';
+String lockFile = '${RuntimeEnvir.dataPath}/cache/init_lock';
 // 清华源
 String source = '''
 deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ hirsute main universe multiverse
@@ -65,10 +64,10 @@ install_vs_code(){
   if [ ! -d "$ubuntuPath/home/code-server-$version-linux-arm64" ];then
     cd $ubuntuPath/home
     server_path="/sdcard/code-server-$version-linux-arm64.tar.gz"
-    if [ ! -d "\$server_path" ];then
+    if [ ! -f "\$server_path" ];then
       dart_dio \\
-      https://nightmare-my.oss-cn-beijing.aliyuncs.com/code-server-4.4.0-linux-arm64.tar.gz \\
-      /sdcard/code-server-4.4.0-linux-arm64.tar.gz
+      https://nightmare-my.oss-cn-beijing.aliyuncs.com/code-server-$version-linux-arm64.tar.gz \\
+      /sdcard/code-server-$version-linux-arm64.tar.gz
     fi
     colorEcho - 解压 Vs Code Arm64
     tar zxvfh \$server_path

@@ -16,7 +16,7 @@ class HttpHandler {
     // Log.d('argsStr ->$cmdLine');
     final String argsStr = cmdLine.replaceAll(regExp, '');
     if (argsStr.isEmpty) {
-      print('参数为空');
+      Log.d('参数为空');
       controller.write('使用方法：\n');
       controller.write('dio 下载的url 保存路径\n');
       await Process.run('rm', ['-rf', dioLockFile]);
