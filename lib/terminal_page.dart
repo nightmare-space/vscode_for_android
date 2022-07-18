@@ -6,11 +6,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pty/flutter_pty.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
+import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
+import 'package:settings/settings.dart';
 import 'package:vscode_for_android/utils/extension.dart';
 import 'package:xterm/next.dart';
 import 'config.dart';
 import 'http_handler.dart';
+import 'privacy_page.dart';
 import 'utils/plugin_util.dart';
 import 'script.dart';
 import 'xterm_wrapper.dart';
@@ -105,9 +108,11 @@ class _TerminalPageState extends State<TerminalPage> {
       if (event.contains('already')) {
         completer.complete();
       }
-      event.split('').forEach((element) {
-        terminal.write(element);
-      });
+
+      terminal.write(event);
+      // event.split('').forEach((element) {
+      //   terminal.write(event);
+      // });
     });
     await completer.future;
     PlauginUtil.openWebView();
@@ -192,7 +197,12 @@ class _TerminalPageState extends State<TerminalPage> {
   @override
   void initState() {
     super.initState();
-    createPtyTerm();
+    Future.delayed(Duration.zero, () async {
+      if ('privacy'.get == null) {
+        await Get.to(const PrivacyAgreePage());
+      }
+      createPtyTerm();
+    });
   }
 
   @override
