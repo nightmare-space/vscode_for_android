@@ -1,7 +1,5 @@
-
 // code-server版本号
 import 'package:global_repository/global_repository.dart';
-
 
 String version = '4.5.0';
 // prootDistro 路径
@@ -11,9 +9,19 @@ String ubuntuPath = '$prootDistroPath/installed-rootfs/ubuntu';
 String lockFile = '${RuntimeEnvir.dataPath}/cache/init_lock';
 // 清华源
 String source = '''
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ hirsute main universe multiverse
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ hirsute-updates main universe multiverse
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ hirsute-security main universe multiverse
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-updates main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-updates main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-backports main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-security main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-security main restricted universe multiverse
+
+# 预发布软件源，不建议启用
+# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-proposed main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-proposed main restricted universe multiverse
 ''';
 
 String colorEcho = '''
@@ -83,6 +91,7 @@ $installVsCodeScript
 start_vs_code(){
   install_vs_code
   mkdir -p $ubuntuPath/root/.config/code-server 2>/dev/null
+  echo '$source' > $ubuntuPath/etc/apt/sources.list
   echo '
   bind-addr: 0.0.0.0:10000
   auth: none
