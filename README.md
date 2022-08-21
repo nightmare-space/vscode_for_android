@@ -1,4 +1,4 @@
-# vscode_for_android
+# Code FA
 
 这是一个使用 code-server 实现的 VS Code 安卓版。这个方案也有些人实现了，这里也是提供其中一种。
 
@@ -16,9 +16,17 @@ Cheers! 🍻
 
 ## 一个坑
 code-server github release 中发布的 arm 版本的压缩包中存在硬链接，这部分文件解压到安卓上会失败。
-所以需要将下载的 gz 压缩包解压到电脑上，再压缩回去，带上 -h 参数，
+所以需要将下载的 gz 压缩包解压到电脑上，再压缩回去，带上 --hard-dereference 参数。
+
+**macOS 需要安装 gnu-tar，不然在安卓上解压会各种报错**
+### 解压
+```
+gtar -zcvh code.tar.gz code-server-4.6.0-linux-arm64.tar.gz
+```
+### 打包
+
 ```sh
-tar -zcvhf code.tar.gz code-server-4.4.0-linux-arm64
+gtar --hard-dereference -zcvhf code.tar.gz code-server-4.6.0-linux-arm64
 ```
 
 ## Getting Started
