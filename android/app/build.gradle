@@ -31,7 +31,15 @@ keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 // end
 android {
     compileSdkVersion 31
-
+    // ndkVersion "21.1.6352462"
+//     externalNativeBuild {
+// //            ndkBuild {
+// //                path 'jni/Android.mk'
+// //            }
+//         cmake {
+//             version "3.22.1"
+//         }
+//     }
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
         targetCompatibility JavaVersion.VERSION_1_8
