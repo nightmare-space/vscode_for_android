@@ -72,6 +72,14 @@ class _TerminalPageState extends State<TerminalPage> {
       'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',
       '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
     );
+    // try {
+    //   String ubuntuVersion =
+    //       File('$prootDistroPath/installed-rootfs/ubuntu/etc/issue')
+    //           .readAsStringSync();
+    //   if(ubuntuVersion.contains('21.04')){
+    //     await Ub
+    //   }
+    // } catch (e) {}
     pseudoTerminal = Pty.start(
       '${RuntimeEnvir.binPath}/bash',
       arguments: [],
@@ -90,6 +98,8 @@ class _TerminalPageState extends State<TerminalPage> {
     vsCodeStaring = true;
     setState(() {});
     pseudoTerminal.writeString('''start_vs_code\n''');
+    // pseudoTerminal
+    //     .writeString('''cd $prootDistroPath/installed-rootfs/ubuntu\n''');
   }
 
   Future<void> vsCodeStartWhenSuccessBind() async {
@@ -98,7 +108,7 @@ class _TerminalPageState extends State<TerminalPage> {
     pseudoTerminal.output
         .cast<List<int>>()
         .transform(const Utf8Decoder())
-        .listen((event) {
+        .listen((event) async {
       final List<String> list = event.split(RegExp('\x0d|\x0a'));
       final String lastLine = list.last.trim();
       if (lastLine.startsWith(RegExp('dart_dio'))) {
@@ -114,6 +124,28 @@ class _TerminalPageState extends State<TerminalPage> {
         Log.e(event);
         if (!completer.isCompleted) {
           completer.complete();
+          await AssetsUtils.copyAssetToPath(
+            'assets/Alipay.png',
+            '$ubuntuPath/root/捐赠二维码-支付宝.png',
+          );
+          await AssetsUtils.copyAssetToPath(
+            'assets/Alipay.png',
+            '$ubuntuPath/root/捐赠二维码-微信.png',
+          );
+          File('$ubuntuPath/root/捐赠说明.md').writeAsStringSync(
+            'Code FA 是免费并且开源的项目，花费了我不少的业余时间，如果你觉得这个软件有帮到你，可以为作者打钱充电，我会有更多开发时的动力~',
+          );
+          await AssetsUtils.copyAssetToPath(
+            'assets/Alipay.png',
+            '$ubuntuPath/home/捐赠二维码-支付宝.png',
+          );
+          await AssetsUtils.copyAssetToPath(
+            'assets/Alipay.png',
+            '$ubuntuPath/home/捐赠二维码-微信.png',
+          );
+          File('$ubuntuPath/home/捐赠说明.md').writeAsStringSync(
+            'Code FA 是免费并且开源的项目，花费了我不少的业余时间，如果你觉得这个软件有帮到你，可以为作者打钱充电，我会有更多开发时的动力~',
+          );
         }
       }
       if (event.contains('already')) {
@@ -158,8 +190,11 @@ class _TerminalPageState extends State<TerminalPage> {
     setState(() {});
     await Future.delayed(const Duration(milliseconds: 100));
     terminal.write('${getRedLog('- 解压资源中...')}\r\n');
+    // 创建相关文件夹
     Directory(RuntimeEnvir.tmpPath).createSync(recursive: true);
     Directory(RuntimeEnvir.homePath).createSync(recursive: true);
+    Directory('$prootDistroPath/dlcache').createSync(recursive: true);
+
     await AssetsUtils.copyAssetToPath(
       'assets/bootstrap-aarch64.zip',
       '${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip',
@@ -167,9 +202,6 @@ class _TerminalPageState extends State<TerminalPage> {
     await AssetsUtils.copyAssetToPath(
       'assets/proot-distro.zip',
       '${RuntimeEnvir.homePath}/proot-distro.zip',
-    );
-    Directory('$prootDistroPath/dlcache').createSync(
-      recursive: true,
     );
     await AssetsUtils.copyAssetToPath(
       'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',

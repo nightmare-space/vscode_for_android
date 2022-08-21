@@ -50,6 +50,7 @@ colorEcho(){
 //   yarn install
 // }
 // ''';
+
 /// 安装ubuntu的shell
 String installUbuntu = '''
 install_ubuntu(){
@@ -57,9 +58,21 @@ install_ubuntu(){
   colorEcho - 安装Ubuntu Linux
   unzip -o proot-distro.zip >/dev/null
   cd ~/proot-distro-master
-  bash ./install.sh
-  apt-get install -y proot
+  bash ./install.sh >/dev/null
+  apt-get install -y proot >/dev/null
+  old=`cat $ubuntuPath/etc/issue`
+  echo \$old
+  strB="21.04"
+  result=\$(echo \$old | grep "\${strB}")
+  if [ "\$result" != "" ]; then
+    echo "升级ubuntu中"
+    mv -f $ubuntuPath/home ./
+    rm -rf $ubuntuPath
+  else
+    echo ""
+  fi
   proot-distro install ubuntu
+  mv -f ./home $ubuntuPath/
   echo '$source' > $ubuntuPath/etc/apt/sources.list
   echo 'export PATH=/home/code-server-$version-linux-arm64/bin:\$PATH' >> $ubuntuPath/root/.bashrc
 }
