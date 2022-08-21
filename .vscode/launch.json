@@ -47,6 +47,12 @@
             "deviceId": "M2102J2SC"
         },
         {
+            "name": "小米12s",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "2206123SC"
+        },
+        {
             "name": "红米K30",
             "request": "launch",
             "type": "dart",
