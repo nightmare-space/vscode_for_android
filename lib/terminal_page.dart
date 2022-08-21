@@ -64,6 +64,14 @@ class _TerminalPageState extends State<TerminalPage> {
         return;
       }
     }
+    await AssetsUtils.copyAssetToPath(
+      'assets/proot-distro.zip',
+      '${RuntimeEnvir.homePath}/proot-distro.zip',
+    );
+    await AssetsUtils.copyAssetToPath(
+      'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',
+      '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
+    );
     pseudoTerminal = Pty.start(
       '${RuntimeEnvir.binPath}/bash',
       arguments: [],
@@ -103,10 +111,16 @@ class _TerminalPageState extends State<TerminalPage> {
         return;
       }
       if (event.contains('http://0.0.0.0:10000')) {
-        completer.complete();
+        Log.e(event);
+        if (!completer.isCompleted) {
+          completer.complete();
+        }
       }
       if (event.contains('already')) {
-        completer.complete();
+        Log.e(event);
+        // if (!completer.isCompleted) {
+        //   completer.complete();
+        // }
       }
 
       terminal.write(event);
@@ -115,6 +129,7 @@ class _TerminalPageState extends State<TerminalPage> {
       // });
     });
     await completer.future;
+    await Future.delayed(const Duration(milliseconds: 100));
     PlauginUtil.openWebView();
     setState(() {});
     Future.delayed(const Duration(milliseconds: 2000), () {
@@ -157,8 +172,8 @@ class _TerminalPageState extends State<TerminalPage> {
       recursive: true,
     );
     await AssetsUtils.copyAssetToPath(
-      'assets/ubuntu-aarch64-pd-v2.3.1.tar.xz',
-      '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v2.3.1.tar.xz',
+      'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',
+      '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
     );
     await unzipBootstrap('${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip');
     pseudoTerminal.writeString('initApp\n');
