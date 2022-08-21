@@ -1,7 +1,7 @@
 // code-server版本号
 import 'package:global_repository/global_repository.dart';
 
-String version = '4.5.0';
+String version = '4.6.0';
 // prootDistro 路径
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
 // ubuntu 路径
@@ -10,18 +10,18 @@ String lockFile = '${RuntimeEnvir.dataPath}/cache/init_lock';
 // 清华源
 String source = '''
 # 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal main restricted universe multiverse
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-updates main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-updates main restricted universe multiverse
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-backports main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-backports main restricted universe multiverse
-deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-security main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-security main restricted universe multiverse
-
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-updates main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+ 
 # 预发布软件源，不建议启用
-# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-proposed main restricted universe multiverse
-# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ focal-proposed main restricted universe multiverse
+# deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
 ''';
 
 String colorEcho = '''
@@ -55,8 +55,8 @@ String installUbuntu = '''
 install_ubuntu(){
   cd ~
   colorEcho - 安装Ubuntu Linux
-  unzip proot-distro.zip >/dev/null
-  #cd ~/proot-distro
+  unzip -o proot-distro.zip >/dev/null
+  cd ~/proot-distro-master
   bash ./install.sh
   apt-get install -y proot
   proot-distro install ubuntu
@@ -78,7 +78,7 @@ install_vs_code(){
       /sdcard/code-server-$version-linux-arm64.tar.gz
     fi
     colorEcho - 解压 Vs Code Arm64
-    tar zxvfh \$server_path
+    tar zxvfh \$server_path > /dev/null
     cd code-server-$version-linux-arm64
   fi
 }
@@ -87,8 +87,11 @@ install_vs_code(){
 // TODO 加上端口的kill
 /// 启动 vs code 的shell
 String startVsCodeScript = '''
+$installUbuntu
 $installVsCodeScript
 start_vs_code(){
+  clear
+  install_ubuntu
   install_vs_code
   mkdir -p $ubuntuPath/root/.config/code-server 2>/dev/null
   echo '$source' > $ubuntuPath/etc/apt/sources.list
