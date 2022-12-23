@@ -21,12 +21,12 @@ code-server github release 中发布的 arm 版本的压缩包中存在硬链接
 **macOS 需要安装 gnu-tar，不然在安卓上解压会各种报错**
 ### 解压
 ```
-gtar -zcvh code.tar.gz code-server-4.6.0-linux-arm64.tar.gz
+gtar -zxvf code-server-4.9.1-linux-arm64.tar.gz
 ```
 ### 打包
 
 ```sh
-gtar --hard-dereference -zcvhf code.tar.gz code-server-4.6.0-linux-arm64
+gtar --hard-dereference -zcvhf code.tar.gz code-server-4.9.1-linux-arm64
 ```
 
 ## Getting Started

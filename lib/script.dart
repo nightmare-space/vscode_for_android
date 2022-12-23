@@ -1,7 +1,7 @@
 // code-server版本号
 import 'package:global_repository/global_repository.dart';
 
-String version = '4.6.0';
+String version = '';
 // prootDistro 路径
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
 // ubuntu 路径
@@ -86,13 +86,12 @@ install_vs_code(){
     cd $ubuntuPath/home
     server_path="/sdcard/code-server-$version-linux-arm64.tar.gz"
     if [ ! -f "\$server_path" ];then
-      dart_dio \\
-      https://nightmare-my.oss-cn-beijing.aliyuncs.com/code-server-$version-linux-arm64.tar.gz \\
-      /sdcard/code-server-$version-linux-arm64.tar.gz
+      echo "没有发现外置包，请到http://nightmare.press:5244/AliYun下载外置包"
+    else
+      colorEcho - 解压 Vs Code Arm64
+      tar zxvfh \$server_path > /dev/null
+      cd code-server-$version-linux-arm64
     fi
-    colorEcho - 解压 Vs Code Arm64
-    tar zxvfh \$server_path > /dev/null
-    cd code-server-$version-linux-arm64
   fi
 }
 ''';
