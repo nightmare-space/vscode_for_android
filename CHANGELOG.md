@@ -1,3 +1,7 @@
+## 1.1.7
+- 增加了一件简陋的版本选择页面，现在只需要把对应的版本放在 /Sdcard 下然后输入版本号即可加载对应的 Code Server
+Code Server 下载地址 http://nightmare.press:5244/AliYun
+
 ## 1.1.6
 - ubuntu 版本升级到 22.04，并切换至相应的源
 - 此版本会覆盖升级 ubuntu 版本，会自动备份 home 文件夹

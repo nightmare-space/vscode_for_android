@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
 import 'package:settings/settings.dart';
 
+import 'load_page.dart';
 import 'terminal_page.dart';
 
 Future<void> main() async {
@@ -30,7 +31,7 @@ class MyApp extends StatelessWidget {
       ),
       home: const Scaffold(
         backgroundColor: Colors.transparent,
-        body: TerminalPage(),
+        body: LoadPage(),
       ),
     );
   }
