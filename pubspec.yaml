@@ -1,7 +1,7 @@
 name: vscode_for_android
 description: A new Flutter project.
 publish_to: 'none' # Remove this line if you wish to publish to pub.dev
-version: 1.1.7+9
+version: 1.1.8+10
 environment:
   sdk: ">=2.10.0 <3.0.0"
 
@@ -17,8 +17,8 @@ dependencies:
   flutter_markdown: ^0.6.10+2
   xterm:
     git:
-      url: https://github.com/mengyanshou/xterm.dart
-      ref: v3
+      url: https://github.com/TerminalStudio/xterm.dart
+      ref: master
   settings:
     git: https://github.com/nightmare-space/settings
   flutter_pty:

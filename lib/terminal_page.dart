@@ -10,7 +10,7 @@ import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
 import 'package:settings/settings.dart';
 import 'package:vscode_for_android/utils/extension.dart';
-import 'package:xterm/next.dart';
+import 'package:xterm/xterm.dart';
 import 'config.dart';
 import 'http_handler.dart';
 import 'privacy_page.dart';

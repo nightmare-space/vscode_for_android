@@ -1,3 +1,6 @@
+## 1.1.8
+- 限制Android版本
+
 ## 1.1.7
 - 增加了一件简陋的版本选择页面，现在只需要把对应的版本放在 /Sdcard 下然后输入版本号即可加载对应的 Code Server
 Code Server 下载地址 http://nightmare.press:5244/AliYun
