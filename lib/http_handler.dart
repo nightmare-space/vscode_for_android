@@ -6,10 +6,11 @@ import 'package:xterm/xterm.dart';
 import 'config.dart';
 
 const String dioLockFile = '/data/data/${Config.packageName}/files/dio_lock';
+
 class HttpHandler {
   static Future<void> handDownload({
-    String cmdLine,
-    Terminal controller,
+    required String cmdLine,
+    required Terminal controller,
   }) async {
     Log.d('handDownload');
     final RegExp regExp = RegExp('dart_dio');

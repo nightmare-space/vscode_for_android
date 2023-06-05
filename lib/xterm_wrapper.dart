@@ -8,9 +8,9 @@ import 'package:xterm/xterm.dart';
 
 class XTermWrapper extends StatefulWidget {
   const XTermWrapper({
-    Key key,
-    this.terminal,
-    this.pseudoTerminal,
+    Key? key,
+    required this.terminal,
+    required this.pseudoTerminal,
   }) : super(key: key);
   final Terminal terminal;
   final Pty pseudoTerminal;
@@ -20,7 +20,7 @@ class XTermWrapper extends StatefulWidget {
 }
 
 class _XTermWrapperState extends State<XTermWrapper> {
-  StreamSubscription streamSubscription;
+  StreamSubscription? streamSubscription;
 
   @override
   void initState() {

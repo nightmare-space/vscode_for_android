@@ -8,7 +8,7 @@ import 'package:vscode_for_android/script.dart';
 import 'package:vscode_for_android/terminal_page.dart';
 
 class LoadPage extends StatefulWidget {
-  const LoadPage({Key key}) : super(key: key);
+  const LoadPage({Key ?key}) : super(key: key);
 
   @override
   State<LoadPage> createState() => _LoadPageState();
