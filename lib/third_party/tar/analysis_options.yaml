@@ -1,0 +1,20 @@
+include: package:extra_pedantic/analysis_options.2.0.0.yaml
+
+analyzer:
+  strong-mode:
+    implicit-casts: false
+    implicit-dynamic: false
+  language:
+    strict-inference: true
+    strict-raw-types: true
+
+linter:
+  rules:
+    close_sinks: false # This rule has just too many false-positives...
+    comment_references: true
+    literal_only_boolean_expressions: false # Nothing wrong with a little while(true)
+    parameter_assignments: false
+    unnecessary_await_in_return: false
+    no_default_cases: false
+    prefer_asserts_with_message: false # We only use asserts for library-internal invariants
+    prefer_final_parameters: false # Too much noise

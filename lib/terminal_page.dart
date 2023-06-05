@@ -8,18 +8,19 @@ import 'package:flutter_pty/flutter_pty.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
+import 'package:path/path.dart' as path;
 import 'package:settings/settings.dart';
 import 'package:vscode_for_android/utils/extension.dart';
 import 'package:xterm/xterm.dart';
 import 'config.dart';
 import 'http_handler.dart';
-import 'privacy_page.dart';
+import 'io.dart';
 import 'utils/plugin_util.dart';
 import 'script.dart';
 import 'xterm_wrapper.dart';
 
 class TerminalPage extends StatefulWidget {
-  const TerminalPage({Key key}) : super(key: key);
+  const TerminalPage({Key? key}) : super(key: key);
 
   @override
   State<TerminalPage> createState() => _TerminalPageState();
@@ -27,8 +28,8 @@ class TerminalPage extends StatefulWidget {
 
 class _TerminalPageState extends State<TerminalPage> {
   // 环境变量
-  Map<String, String> envir;
-  Pty pseudoTerminal;
+  late Map<String, String> envir;
+  Pty? pseudoTerminal;
   bool vsCodeStaring = false;
   Terminal terminal = Terminal();
 
@@ -51,7 +52,7 @@ class _TerminalPageState extends State<TerminalPage> {
     if (File('${RuntimeEnvir.usrPath}/lib/libtermux-exec.so').existsSync()) {
       envir['LD_PRELOAD'] = '${RuntimeEnvir.usrPath}/lib/libtermux-exec.so';
     }
-    Directory(RuntimeEnvir.binPath).createSync(
+    Directory(RuntimeEnvir.binPath!).createSync(
       recursive: true,
     );
     String dioPath = '${RuntimeEnvir.binPath}/dart_dio';
@@ -87,8 +88,8 @@ class _TerminalPageState extends State<TerminalPage> {
       workingDirectory: RuntimeEnvir.homePath,
     );
     Future.delayed(const Duration(milliseconds: 300), () {
-      pseudoTerminal.writeString(startVsCodeScript);
-      startVsCode(pseudoTerminal);
+      pseudoTerminal!.writeString(startVsCodeScript);
+      startVsCode(pseudoTerminal!);
     });
     setState(() {});
     vsCodeStartWhenSuccessBind();
@@ -105,10 +106,7 @@ class _TerminalPageState extends State<TerminalPage> {
   Future<void> vsCodeStartWhenSuccessBind() async {
     // WebView.platform = SurfaceAndroidWebView();
     final Completer completer = Completer();
-    pseudoTerminal.output
-        .cast<List<int>>()
-        .transform(const Utf8Decoder())
-        .listen((event) async {
+    pseudoTerminal!.output.cast<List<int>>().transform(const Utf8Decoder(allowMalformed: true)).listen((event) async {
       final List<String> list = event.split(RegExp('\x0d|\x0a'));
       final String lastLine = list.last.trim();
       if (lastLine.startsWith(RegExp('dart_dio'))) {
@@ -184,12 +182,10 @@ class _TerminalPageState extends State<TerminalPage> {
 
     vsCodeStartWhenSuccessBind();
     await Future.delayed(const Duration(milliseconds: 300));
-    pseudoTerminal.writeString(
-      initShell,
-    );
+    pseudoTerminal!.defineFunction(initShell);
     setState(() {});
     await Future.delayed(const Duration(milliseconds: 100));
-    terminal.write('${getRedLog('- 解压资源中...')}\r\n');
+    terminal.write(getRedLog('- 解压资源中...\r\n'));
     // 创建相关文件夹
     Directory(RuntimeEnvir.tmpPath).createSync(recursive: true);
     Directory(RuntimeEnvir.homePath).createSync(recursive: true);
@@ -208,7 +204,20 @@ class _TerminalPageState extends State<TerminalPage> {
       '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
     );
     await unzipBootstrap('${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip');
-    pseudoTerminal.writeString('initApp\n');
+    await extractTarGz(
+      readBinaryFileAsStream('/sdcard/code-server-$version-linux-arm64.tar.gz'),
+      RuntimeEnvir.homePath,
+      (data) {
+        terminal.write('$data\r\n');
+      },
+    );
+    pseudoTerminal!.writeString('initApp\n');
+  }
+
+  Stream<List<int>> readBinaryFileAsStream(String file) {
+    print('Reading binary file $file.');
+    var contents = File(file).openRead();
+    return contents;
   }
 
   Future<void> unzipBootstrap(String modulePath) async {
@@ -222,21 +231,23 @@ class _TerminalPageState extends State<TerminalPage> {
     // print('total -> $total count -> $count');
     for (final file in archive) {
       final filename = file.name;
-      final String path = '${RuntimeEnvir.usrPath}/$filename';
-      Log.d(path);
+      final String filePath = '${RuntimeEnvir.usrPath}/$filename';
+      // Log.d(path);
+      terminal.write('\x1b[2K\r - ${path.basename(filePath)}');
+      // terminal.write('\x1b[2K\r');
+
       if (file.isFile) {
         final data = file.content as List<int>;
-        await File(path).create(recursive: true);
-        await File(path).writeAsBytes(data);
+        await File(filePath).create(recursive: true);
+        await File(filePath).writeAsBytes(data);
       } else {
-        Directory(path).create(
-          recursive: true,
-        );
+        Directory(filePath).create(recursive: true);
       }
       count++;
-      Log.d('total -> $total count -> $count');
+      // Log.d('total -> $total count -> $count');
       setState(() {});
     }
+    terminal.write('\r\n');
     File(modulePath).delete();
     setState(() {});
   }
@@ -245,8 +256,14 @@ class _TerminalPageState extends State<TerminalPage> {
   void initState() {
     super.initState();
     Future.delayed(Duration.zero, () async {
-      if ('privacy'.get == null) {
-        await Get.to(const PrivacyAgreePage());
+      SettingNode settingNode = 'privacy'.setting;
+      if (settingNode.get() == null) {
+        await Get.to(PrivacyAgreePage(
+          onAgreeTap: () {
+            settingNode.set(true);
+            Navigator.of(context).pop();
+          },
+        ));
       }
       createPtyTerm();
     });
@@ -259,7 +276,7 @@ class _TerminalPageState extends State<TerminalPage> {
     }
     return WillPopScope(
       onWillPop: () async {
-        pseudoTerminal.writeString('\x03');
+        pseudoTerminal!.writeString('\x03');
         return true;
       },
       child: Stack(
@@ -268,7 +285,7 @@ class _TerminalPageState extends State<TerminalPage> {
             SafeArea(
               child: XTermWrapper(
                 terminal: terminal,
-                pseudoTerminal: pseudoTerminal,
+                pseudoTerminal: pseudoTerminal!,
               ),
             ),
           Center(
@@ -316,5 +333,23 @@ class _TerminalPageState extends State<TerminalPage> {
         ],
       ),
     );
+  }
+}
+
+extension PTYExt on Pty {
+  Future<void> defineFunction(String function) async {
+    print('define func');
+    Directory(RuntimeEnvir.tmpPath).createSync(recursive: true);
+    Directory dir = Directory(RuntimeEnvir.tmpPath).createTempSync();
+    File('${dir.path}/shell').writeAsStringSync(function);
+    // 删除这个文件夹
+    // pty.write(Uint8List.fromList(Utf8Encoder().convert('chmod +x ${dir.path}/shell\n')));
+    write(Uint8List.fromList(Utf8Encoder().convert('source ${dir.path}/shell\n')));
+    Future.delayed(Duration(seconds: 1), () {
+      dir.delete(recursive: true);
+    });
+    // 等待1s
+    await Future.delayed(Duration(seconds: 1));
+    // source完成后删除源文件
   }
 }

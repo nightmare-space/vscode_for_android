@@ -102,9 +102,8 @@ String startVsCodeScript = '''
 $installUbuntu
 $installVsCodeScript
 start_vs_code(){
-  clear
-  install_ubuntu
-  install_vs_code
+  #install_ubuntu
+  #install_vs_code
   mkdir -p $ubuntuPath/root/.config/code-server 2>/dev/null
   echo '$source' > $ubuntuPath/etc/apt/sources.list
   echo '
@@ -135,8 +134,10 @@ function initApp(){
     IFS="←"
     arr=(\$line)
     IFS="\$OLD_IFS"
+    echo -n -e "\x1b[2K\r- \${arr[0]}"
     ln -s \${arr[0]} \${arr[3]}
   done
+  echo
   rm -rf SYMLINKS.txt
   TMPDIR=${RuntimeEnvir.tmpPath}
   filename=bootstrap
@@ -145,10 +146,11 @@ function initApp(){
   chmod -R 0777 ${RuntimeEnvir.binPath}/*
   chmod -R 0777 ${RuntimeEnvir.usrPath}/lib/* 2>/dev/null
   chmod -R 0777 ${RuntimeEnvir.usrPath}/libexec/* 2>/dev/null
-  apt update
   rm -rf $lockFile
   export LD_PRELOAD=${RuntimeEnvir.usrPath}/lib/libtermux-exec.so
   install_ubuntu
+  mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/home/
+  chmod +x $ubuntuPath/home/code-server-$version-linux-arm64/bin/code-server
   start_vs_code
   bash
 }

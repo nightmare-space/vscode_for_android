@@ -9,7 +9,7 @@ import 'terminal_page.dart';
 
 Future<void> main() async {
   RuntimeEnvir.initEnvirWithPackageName('com.nightmare.code');
-  await initSettingStore(RuntimeEnvir.configPath);
+  await initSettingStore(RuntimeEnvir.configPath!);
   runApp(const MyApp());
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,
@@ -19,7 +19,7 @@ Future<void> main() async {
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key key}) : super(key: key);
+  const MyApp({Key? key}) : super(key: key);
 
   // This widget is the root of your application.
   @override
