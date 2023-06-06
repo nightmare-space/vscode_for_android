@@ -1,6 +1,6 @@
 import 'package:flutter/services.dart';
 
-class PlauginUtil {
+class PluginUtil {
   static void openWebView() {
     MethodChannel channel = const MethodChannel('vscode_channel');
     channel.invokeMethod('');

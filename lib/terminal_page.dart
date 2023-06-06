@@ -17,6 +17,7 @@ import 'http_handler.dart';
 import 'io.dart';
 import 'utils/plugin_util.dart';
 import 'script.dart';
+import 'utils/zip_util.dart';
 import 'xterm_wrapper.dart';
 
 class TerminalPage extends StatefulWidget {
@@ -44,6 +45,12 @@ class _TerminalPageState extends State<TerminalPage> {
     if (Platform.isAndroid) {
       await PermissionUtil.requestStorage();
     }
+    File file = File('/sdcard/code_version');
+    if (!file.existsSync()) {
+      file.createSync();
+      file.writeAsStringSync('4.13.0');
+    }
+    version = file.readAsStringSync();
     envir = Map.from(Platform.environment);
     envir['HOME'] = RuntimeEnvir.homePath;
     envir['TERMUX_PREFIX'] = RuntimeEnvir.usrPath;
@@ -52,9 +59,7 @@ class _TerminalPageState extends State<TerminalPage> {
     if (File('${RuntimeEnvir.usrPath}/lib/libtermux-exec.so').existsSync()) {
       envir['LD_PRELOAD'] = '${RuntimeEnvir.usrPath}/lib/libtermux-exec.so';
     }
-    Directory(RuntimeEnvir.binPath!).createSync(
-      recursive: true,
-    );
+    Directory(RuntimeEnvir.binPath!).createSync(recursive: true);
     String dioPath = '${RuntimeEnvir.binPath}/dart_dio';
     File(dioPath).writeAsStringSync(Config.dioScript);
     await exec('chmod +x $dioPath');
@@ -73,14 +78,6 @@ class _TerminalPageState extends State<TerminalPage> {
       'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',
       '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
     );
-    // try {
-    //   String ubuntuVersion =
-    //       File('$prootDistroPath/installed-rootfs/ubuntu/etc/issue')
-    //           .readAsStringSync();
-    //   if(ubuntuVersion.contains('21.04')){
-    //     await Ub
-    //   }
-    // } catch (e) {}
     pseudoTerminal = Pty.start(
       '${RuntimeEnvir.binPath}/bash',
       arguments: [],
@@ -88,7 +85,7 @@ class _TerminalPageState extends State<TerminalPage> {
       workingDirectory: RuntimeEnvir.homePath,
     );
     Future.delayed(const Duration(milliseconds: 300), () {
-      pseudoTerminal!.writeString(startVsCodeScript);
+      pseudoTerminal?.defineFunction(startVsCodeScript);
       startVsCode(pseudoTerminal!);
     });
     setState(() {});
@@ -99,6 +96,7 @@ class _TerminalPageState extends State<TerminalPage> {
     vsCodeStaring = true;
     setState(() {});
     pseudoTerminal.writeString('''start_vs_code\n''');
+    // pseudoTerminal.writeString('''cd $ubuntuPath/home/code-server-4.12.0-linux-arm64/lib/vscode/node_modules/node-pty/build/Release''');
     // pseudoTerminal
     //     .writeString('''cd $prootDistroPath/installed-rootfs/ubuntu\n''');
   }
@@ -122,28 +120,6 @@ class _TerminalPageState extends State<TerminalPage> {
         Log.e(event);
         if (!completer.isCompleted) {
           completer.complete();
-          await AssetsUtils.copyAssetToPath(
-            'assets/Alipay.png',
-            '$ubuntuPath/root/捐赠二维码-支付宝.png',
-          );
-          await AssetsUtils.copyAssetToPath(
-            'assets/Alipay.png',
-            '$ubuntuPath/root/捐赠二维码-微信.png',
-          );
-          File('$ubuntuPath/root/捐赠说明.md').writeAsStringSync(
-            'Code FA 是免费并且开源的项目，花费了我不少的业余时间，如果你觉得这个软件有帮到你，可以为作者打钱充电，我会有更多开发时的动力~',
-          );
-          await AssetsUtils.copyAssetToPath(
-            'assets/Alipay.png',
-            '$ubuntuPath/home/捐赠二维码-支付宝.png',
-          );
-          await AssetsUtils.copyAssetToPath(
-            'assets/Alipay.png',
-            '$ubuntuPath/home/捐赠二维码-微信.png',
-          );
-          File('$ubuntuPath/home/捐赠说明.md').writeAsStringSync(
-            'Code FA 是免费并且开源的项目，花费了我不少的业余时间，如果你觉得这个软件有帮到你，可以为作者打钱充电，我会有更多开发时的动力~',
-          );
         }
       }
       if (event.contains('already')) {
@@ -160,7 +136,8 @@ class _TerminalPageState extends State<TerminalPage> {
     });
     await completer.future;
     await Future.delayed(const Duration(milliseconds: 100));
-    PlauginUtil.openWebView();
+    // 用url_launcher打开浏览器
+    PluginUtil.openWebView();
     setState(() {});
     Future.delayed(const Duration(milliseconds: 2000), () {
       vsCodeStaring = false;
@@ -185,10 +162,10 @@ class _TerminalPageState extends State<TerminalPage> {
     pseudoTerminal!.defineFunction(initShell);
     setState(() {});
     await Future.delayed(const Duration(milliseconds: 100));
-    terminal.write(getRedLog('- 解压资源中...\r\n'));
+    terminal.write(getRedLog('\r\n- 解压资源中...\r\n'));
     // 创建相关文件夹
-    Directory(RuntimeEnvir.tmpPath).createSync(recursive: true);
-    Directory(RuntimeEnvir.homePath).createSync(recursive: true);
+    Directory(RuntimeEnvir.tmpPath!).createSync(recursive: true);
+    Directory(RuntimeEnvir.homePath!).createSync(recursive: true);
     Directory('$prootDistroPath/dlcache').createSync(recursive: true);
 
     await AssetsUtils.copyAssetToPath(
@@ -203,12 +180,17 @@ class _TerminalPageState extends State<TerminalPage> {
       'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',
       '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
     );
-    await unzipBootstrap('${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip');
+    await ZipUtil.unzipBootstrap('${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip', onFile: (String name) {
+      terminal.write('\x1b[2K\r- ${path.basename(name)}.');
+      // terminal.write('\x1b7\x1b[2K\x1b[B\x1b[2Kx1b[B\x1b[2K\r- $name.\x1b8');
+    });
+    terminal.write('\r\n');
     await extractTarGz(
       readBinaryFileAsStream('/sdcard/code-server-$version-linux-arm64.tar.gz'),
       RuntimeEnvir.homePath,
       (data) {
-        terminal.write('$data\r\n');
+        print(data);
+        terminal.write(data);
       },
     );
     pseudoTerminal!.writeString('initApp\n');
@@ -218,38 +200,6 @@ class _TerminalPageState extends State<TerminalPage> {
     print('Reading binary file $file.');
     var contents = File(file).openRead();
     return contents;
-  }
-
-  Future<void> unzipBootstrap(String modulePath) async {
-    // Read the Zip file from disk.
-    final bytes = File(modulePath).readAsBytesSync();
-    // Decode the Zip file
-    final archive = ZipDecoder().decodeBytes(bytes);
-    // Extract the contents of the Zip archive to disk.
-    final int total = archive.length;
-    int count = 0;
-    // print('total -> $total count -> $count');
-    for (final file in archive) {
-      final filename = file.name;
-      final String filePath = '${RuntimeEnvir.usrPath}/$filename';
-      // Log.d(path);
-      terminal.write('\x1b[2K\r - ${path.basename(filePath)}');
-      // terminal.write('\x1b[2K\r');
-
-      if (file.isFile) {
-        final data = file.content as List<int>;
-        await File(filePath).create(recursive: true);
-        await File(filePath).writeAsBytes(data);
-      } else {
-        Directory(filePath).create(recursive: true);
-      }
-      count++;
-      // Log.d('total -> $total count -> $count');
-      setState(() {});
-    }
-    terminal.write('\r\n');
-    File(modulePath).delete();
-    setState(() {});
   }
 
   @override
@@ -274,63 +224,66 @@ class _TerminalPageState extends State<TerminalPage> {
     if (pseudoTerminal == null) {
       return const SizedBox();
     }
-    return WillPopScope(
-      onWillPop: () async {
-        pseudoTerminal!.writeString('\x03');
-        return true;
-      },
-      child: Stack(
-        children: [
-          if (pseudoTerminal != null)
-            SafeArea(
-              child: XTermWrapper(
-                terminal: terminal,
-                pseudoTerminal: pseudoTerminal!,
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: WillPopScope(
+        onWillPop: () async {
+          pseudoTerminal!.writeString('\x03');
+          return true;
+        },
+        child: Stack(
+          children: [
+            if (pseudoTerminal != null)
+              SafeArea(
+                child: XTermWrapper(
+                  terminal: terminal,
+                  pseudoTerminal: pseudoTerminal,
+                ),
               ),
-            ),
-          Center(
-            child: Material(
-              color: const Color(0xfff3f4f9),
-              borderRadius: BorderRadius.circular(12.w),
-              clipBehavior: Clip.antiAlias,
-              child: InkWell(
-                onTap: () {
-                  PlauginUtil.openWebView();
-                },
-                child: SizedBox(
-                  height: 48.w,
-                  child: Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 16.w),
-                    child: Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        if (vsCodeStaring)
-                          SpinKitDualRing(
-                            color: Theme.of(context).primaryColor,
-                            size: 18.w,
-                            lineWidth: 2.w,
+            Center(
+              child: Material(
+                color: const Color(0xfff3f4f9),
+                borderRadius: BorderRadius.circular(12.w),
+                clipBehavior: Clip.antiAlias,
+                child: InkWell(
+                  onTap: () {
+                    PluginUtil.openWebView();
+                  },
+                  child: SizedBox(
+                    height: 48.w,
+                    child: Padding(
+                      padding: EdgeInsets.symmetric(horizontal: 16.w),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          if (vsCodeStaring)
+                            SpinKitDualRing(
+                              color: Theme.of(context).primaryColor,
+                              size: 18.w,
+                              lineWidth: 2.w,
+                            ),
+                          if (vsCodeStaring)
+                            const SizedBox(
+                              width: 8,
+                            ),
+                          Text(
+                            vsCodeStaring ? 'VS Code 启动中...' : '打开VS Code窗口',
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              color: Colors.black,
+                              fontSize: 16.w,
+                            ),
                           ),
-                        if (vsCodeStaring)
-                          const SizedBox(
-                            width: 8,
-                          ),
-                        Text(
-                          vsCodeStaring ? 'VS Code 启动中...' : '打开VS Code窗口',
-                          style: TextStyle(
-                            fontWeight: FontWeight.bold,
-                            color: Colors.black,
-                            fontSize: 16.w,
-                          ),
-                        ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
               ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,11 +1,15 @@
+import 'dart:convert';
+import 'dart:io';
+import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
+import 'package:intl/intl.dart';
 import 'package:settings/settings.dart';
-
-import 'load_page.dart';
-import 'terminal_page.dart';
+import 'package:vscode_for_android/terminal_page.dart';
+import 'behavior.dart';
+import 'config.dart';
 
 Future<void> main() async {
   RuntimeEnvir.initEnvirWithPackageName('com.nightmare.code');
@@ -16,6 +20,7 @@ Future<void> main() async {
     systemNavigationBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,
   ));
+  initApi('Code FA', Config.versionName);
 }
 
 class MyApp extends StatelessWidget {
@@ -25,13 +30,13 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return GetMaterialApp(
-      title: 'Vs Code',
+      title: 'Code FA',
       theme: ThemeData(
         primarySwatch: Colors.blue,
       ),
       home: const Scaffold(
         backgroundColor: Colors.transparent,
-        body: LoadPage(),
+        body: TerminalPage(),
       ),
     );
   }

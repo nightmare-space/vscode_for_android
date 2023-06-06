@@ -19,14 +19,18 @@ code-server github release 中发布的 arm 版本的压缩包中存在硬链接
 所以需要将下载的 gz 压缩包解压到电脑上，再压缩回去，带上 --hard-dereference 参数。
 
 **macOS 需要安装 gnu-tar，不然在安卓上解压会各种报错**
+
+brew install gnu-tar
+
 ### 解压
 ```
-gtar -zxvf code-server-4.9.1-linux-arm64.tar.gz
+gtar -zxvf code-server-4.12.0-linux-arm64.tar.gz
 ```
 ### 打包
 
 ```sh
-gtar --hard-dereference -zcvhf code.tar.gz code-server-4.9.1-linux-arm64
+mv code-server-4.12.0-linux-arm64.tar.gz code-server-4.12.0-linux-arm64-old.tar.gz
+gtar --hard-dereference -zcvhf code-server-4.12.0-linux-arm64.tar.gz code-server-4.12.0-linux-arm64
 ```
 
 ## Getting Started
