@@ -49,3 +49,6 @@ code-server-4.0.1-linux-arm64.tar.gz
 code-server-4.4.0-linux-arm64.tar.gz
 
 /tmp
+
+lib/behavior.dart
+lib/behavior.g.dart
