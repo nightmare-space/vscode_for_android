@@ -134,11 +134,11 @@ Future<String> createFileFromStream(
   String file,
   void Function(String data) print,
 ) async {
-  print('Creating $file from stream.');
+  // print('\x1b7- $file.\x1b8');
+  print('\x1b[2K\r- ${path.basename(file)}.');
 
   deleteIfLink(file);
   await stream.pipe(File(file).openWrite());
-  print('Created $file from stream.');
   return file;
 }
 
@@ -148,7 +148,7 @@ Future extractTarGz(
   String destination,
   void Function(String data) print,
 ) async {
-  print('Extracting .tar.gz stream to $destination.');
+  // print('Extracting .tar.gz stream to $destination.');
 
   destination = path.absolute(destination);
   final reader = TarReader(stream.transform(gzip.decoder));

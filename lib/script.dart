@@ -58,21 +58,19 @@ install_ubuntu(){
   colorEcho - 安装Ubuntu Linux
   unzip -o proot-distro.zip >/dev/null
   cd ~/proot-distro-master
-  bash ./install.sh >/dev/null
+  bash ./install.sh >/dev/null 2>&1
   apt-get install -y proot >/dev/null
   old=`cat $ubuntuPath/etc/issue`
-  echo \$old
+  #echo \$old
   strB="21.04"
   result=\$(echo \$old | grep "\${strB}")
   if [ "\$result" != "" ]; then
     echo "升级ubuntu中"
     mv -f $ubuntuPath/home ./
     rm -rf $ubuntuPath
-  else
-    echo ""
   fi
-  proot-distro install ubuntu
-  mv -f ./home $ubuntuPath/
+  proot-distro install ubuntu >/dev/null 2>&1
+  mv -f ./home $ubuntuPath/ >/dev/null 2>&1
   echo '$source' > $ubuntuPath/etc/apt/sources.list
   echo 'export PATH=/home/code-server-$version-linux-arm64/bin:\$PATH' >> $ubuntuPath/root/.bashrc
 }
@@ -114,6 +112,7 @@ start_vs_code(){
   ' > $ubuntuPath/root/.config/code-server/config.yaml
   echo -e "\\033[31m- 启动中..\\033[0m"
   proot-distro login ubuntu -- /home/code-server-$version-linux-arm64/bin/code-server
+  #proot-distro login ubuntu
 }
 ''';
 
@@ -134,7 +133,8 @@ function initApp(){
     IFS="←"
     arr=(\$line)
     IFS="\$OLD_IFS"
-    echo -n -e "\x1b[2K\r- \${arr[0]}"
+    filename=\$(basename "\${arr[0]}")
+    echo -n -e "\x1b[2K\r- \$filename"
     ln -s \${arr[0]} \${arr[3]}
   done
   echo
@@ -151,6 +151,7 @@ function initApp(){
   install_ubuntu
   mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/home/
   chmod +x $ubuntuPath/home/code-server-$version-linux-arm64/bin/code-server
+  chmod +x $ubuntuPath/home/code-server-$version-linux-arm64/lib/node
   start_vs_code
   bash
 }

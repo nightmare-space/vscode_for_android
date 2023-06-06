@@ -56,5 +56,11 @@
             "type": "dart",
             "deviceId": "2211133C"
         },
+        {
+            "name": "小米平板6 PRO",
+            "request": "launch",
+            "type": "dart",
+            "deviceId": "23046RP50C"
+        },
     ]
 }

@@ -14,4 +14,6 @@ class Config {
             }
             done
             exit''';
+
+  static String versionName = '1.1.9';
 }
