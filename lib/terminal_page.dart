@@ -79,10 +79,10 @@ class _TerminalPageState extends State<TerminalPage> {
     );
     pseudoTerminal = createPTY();
     await pseudoTerminal?.defineFunction(startVsCodeScript);
-    await controller.unzipVSCodeIfNotExist();
-    startVsCode(pseudoTerminal!);
     setState(() {});
     vsCodeStartWhenSuccessBind();
+    await controller.unzipVSCodeIfNotExist();
+    startVsCode(pseudoTerminal!);
   }
 
   Future<void> startVsCode(Pty pseudoTerminal) async {
