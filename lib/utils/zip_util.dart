@@ -13,8 +13,8 @@ class ZipUtil {
     // Decode the Zip file
     final archive = ZipDecoder().decodeBytes(bytes);
     // Extract the contents of the Zip archive to disk.
-    final int total = archive.length;
-    int count = 0;
+    // final int total = archive.length;
+    // int count = 0;
     // print('total -> $total count -> $count');
     for (final file in archive) {
       final filename = file.name;
@@ -30,7 +30,7 @@ class ZipUtil {
           recursive: true,
         );
       }
-      count++;
+      // count++;
       // Log.d('total -> $total count -> $count');
     }
     File(modulePath).delete();

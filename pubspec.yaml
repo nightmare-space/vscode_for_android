@@ -32,8 +32,8 @@ dependencies:
   device_info_plus: 8.1.0
 
 dev_dependencies:
-  # flutter_test:
-  #   sdk: flutter
+  flutter_test:
+    sdk: flutter
   flutter_lints: ^2.0.0
 
 flutter:

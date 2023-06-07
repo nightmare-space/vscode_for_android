@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-import 'package:archive/archive.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pty/flutter_pty.dart';
@@ -15,8 +14,10 @@ import 'package:xterm/xterm.dart';
 import 'config.dart';
 import 'http_handler.dart';
 import 'io.dart';
+import 'terminal_controller.dart';
 import 'utils/plugin_util.dart';
 import 'script.dart';
+import 'utils/pty_util.dart';
 import 'utils/zip_util.dart';
 import 'xterm_wrapper.dart';
 
@@ -28,13 +29,11 @@ class TerminalPage extends StatefulWidget {
 }
 
 class _TerminalPageState extends State<TerminalPage> {
-  // 环境变量
-  late Map<String, String> envir;
+  HomeController controller = Get.put(HomeController());
   Pty? pseudoTerminal;
   bool vsCodeStaring = false;
-  Terminal terminal = Terminal();
 
-  // 是否存在bash文件
+  // 是否存在bash文件，初始化后 bash 应该存在
   bool hasBash() {
     final File bashFile = File('${RuntimeEnvir.binPath}/bash');
     final bool exist = bashFile.existsSync();
@@ -46,18 +45,17 @@ class _TerminalPageState extends State<TerminalPage> {
       await PermissionUtil.requestStorage();
     }
     File file = File('/sdcard/code_version');
-    if (!file.existsSync()) {
-      file.createSync();
-      file.writeAsStringSync('4.13.0');
+    try {
+      if (!file.existsSync()) {
+        file.createSync();
+        file.writeAsStringSync('4.13.0');
+      }
+    } catch (e) {
+      // 在小米平板6上会有异常，无法创建文件，怀疑是和Android系统有关
     }
-    version = file.readAsStringSync();
-    envir = Map.from(Platform.environment);
-    envir['HOME'] = RuntimeEnvir.homePath;
-    envir['TERMUX_PREFIX'] = RuntimeEnvir.usrPath;
-    envir['TERM'] = 'xterm-256color';
-    envir['PATH'] = RuntimeEnvir.path;
-    if (File('${RuntimeEnvir.usrPath}/lib/libtermux-exec.so').existsSync()) {
-      envir['LD_PRELOAD'] = '${RuntimeEnvir.usrPath}/lib/libtermux-exec.so';
+    if (file.existsSync()) version = file.readAsStringSync();
+    if (version.isEmpty) {
+      version = '4.13.0';
     }
     Directory(RuntimeEnvir.binPath!).createSync(recursive: true);
     String dioPath = '${RuntimeEnvir.binPath}/dart_dio';
@@ -65,29 +63,24 @@ class _TerminalPageState extends State<TerminalPage> {
     await exec('chmod +x $dioPath');
     if (Platform.isAndroid) {
       if (!hasBash()) {
-        // 初始化后 bash 应该存在
         initTerminal();
         return;
       }
     }
+    // proot-distro 用来安装ubuntu
     await AssetsUtils.copyAssetToPath(
       'assets/proot-distro.zip',
       '${RuntimeEnvir.homePath}/proot-distro.zip',
     );
+    // ubuntu资源包
     await AssetsUtils.copyAssetToPath(
       'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',
       '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
     );
-    pseudoTerminal = Pty.start(
-      '${RuntimeEnvir.binPath}/bash',
-      arguments: [],
-      environment: envir,
-      workingDirectory: RuntimeEnvir.homePath,
-    );
-    Future.delayed(const Duration(milliseconds: 300), () {
-      pseudoTerminal?.defineFunction(startVsCodeScript);
-      startVsCode(pseudoTerminal!);
-    });
+    pseudoTerminal = createPTY();
+    await pseudoTerminal?.defineFunction(startVsCodeScript);
+    await controller.unzipVSCodeIfNotExist();
+    startVsCode(pseudoTerminal!);
     setState(() {});
     vsCodeStartWhenSuccessBind();
   }
@@ -96,11 +89,9 @@ class _TerminalPageState extends State<TerminalPage> {
     vsCodeStaring = true;
     setState(() {});
     pseudoTerminal.writeString('''start_vs_code\n''');
-    // pseudoTerminal.writeString('''cd $ubuntuPath/home/code-server-4.12.0-linux-arm64/lib/vscode/node_modules/node-pty/build/Release''');
-    // pseudoTerminal
-    //     .writeString('''cd $prootDistroPath/installed-rootfs/ubuntu\n''');
   }
 
+  /// 监听输出，当输出中包含vscode启动成功的标志时，启动vscode
   Future<void> vsCodeStartWhenSuccessBind() async {
     // WebView.platform = SurfaceAndroidWebView();
     final Completer completer = Completer();
@@ -109,9 +100,9 @@ class _TerminalPageState extends State<TerminalPage> {
       final String lastLine = list.last.trim();
       if (lastLine.startsWith(RegExp('dart_dio'))) {
         String data = event.replaceAll(RegExp('dart_dio.*'), '');
-        terminal.write(data);
+        controller.terminal.write(data);
         HttpHandler.handDownload(
-          controller: terminal,
+          controller: controller.terminal,
           cmdLine: list.last,
         );
         return;
@@ -129,7 +120,7 @@ class _TerminalPageState extends State<TerminalPage> {
         // }
       }
 
-      terminal.write(event);
+      controller.terminal.write(event);
       // event.split('').forEach((element) {
       //   terminal.write(event);
       // });
@@ -150,22 +141,14 @@ class _TerminalPageState extends State<TerminalPage> {
   }
 
   Future<void> initTerminal() async {
-    pseudoTerminal = Pty.start(
-      '/system/bin/sh',
-      arguments: [],
-      environment: envir,
-      workingDirectory: RuntimeEnvir.homePath,
-    );
-
+    pseudoTerminal = createPTY(shell: '/system/bin/sh');
     vsCodeStartWhenSuccessBind();
-    await Future.delayed(const Duration(milliseconds: 300));
-    pseudoTerminal!.defineFunction(initShell);
+    await pseudoTerminal!.defineFunction(initShell);
     setState(() {});
-    await Future.delayed(const Duration(milliseconds: 100));
-    terminal.write(getRedLog('\r\n- 解压资源中...\r\n'));
+    controller.terminal.write(getRedLog('\r\n- 解压资源中...\r\n'));
     // 创建相关文件夹
-    Directory(RuntimeEnvir.tmpPath!).createSync(recursive: true);
-    Directory(RuntimeEnvir.homePath!).createSync(recursive: true);
+    Directory(RuntimeEnvir.tmpPath).createSync(recursive: true);
+    Directory(RuntimeEnvir.homePath).createSync(recursive: true);
     Directory('$prootDistroPath/dlcache').createSync(recursive: true);
 
     await AssetsUtils.copyAssetToPath(
@@ -181,25 +164,12 @@ class _TerminalPageState extends State<TerminalPage> {
       '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
     );
     await ZipUtil.unzipBootstrap('${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip', onFile: (String name) {
-      terminal.write('\x1b[2K\r- ${path.basename(name)}.');
+      controller.terminal.write('\x1b[2K\r- ${path.basename(name)}.');
       // terminal.write('\x1b7\x1b[2K\x1b[B\x1b[2Kx1b[B\x1b[2K\r- $name.\x1b8');
     });
-    terminal.write('\r\n');
-    await extractTarGz(
-      readBinaryFileAsStream('/sdcard/code-server-$version-linux-arm64.tar.gz'),
-      RuntimeEnvir.homePath,
-      (data) {
-        print(data);
-        terminal.write(data);
-      },
-    );
+    controller.terminal.write('\r\n');
+    await controller.unzipVSCodeIfNotExist();
     pseudoTerminal!.writeString('initApp\n');
-  }
-
-  Stream<List<int>> readBinaryFileAsStream(String file) {
-    print('Reading binary file $file.');
-    var contents = File(file).openRead();
-    return contents;
   }
 
   @override
@@ -236,7 +206,7 @@ class _TerminalPageState extends State<TerminalPage> {
             if (pseudoTerminal != null)
               SafeArea(
                 child: XTermWrapper(
-                  terminal: terminal,
+                  terminal: controller.terminal,
                   pseudoTerminal: pseudoTerminal,
                 ),
               ),
@@ -286,23 +256,5 @@ class _TerminalPageState extends State<TerminalPage> {
         ),
       ),
     );
-  }
-}
-
-extension PTYExt on Pty {
-  Future<void> defineFunction(String function) async {
-    print('define func');
-    Directory(RuntimeEnvir.tmpPath).createSync(recursive: true);
-    Directory dir = Directory(RuntimeEnvir.tmpPath).createTempSync();
-    File('${dir.path}/shell').writeAsStringSync(function);
-    // 删除这个文件夹
-    // pty.write(Uint8List.fromList(Utf8Encoder().convert('chmod +x ${dir.path}/shell\n')));
-    write(Uint8List.fromList(Utf8Encoder().convert('source ${dir.path}/shell\n')));
-    Future.delayed(Duration(seconds: 1), () {
-      dir.delete(recursive: true);
-    });
-    // 等待1s
-    await Future.delayed(Duration(seconds: 1));
-    // source完成后删除源文件
   }
 }
