@@ -1,11 +1,7 @@
-import 'dart:convert';
-import 'dart:io';
-import 'package:device_info_plus/device_info_plus.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
-import 'package:intl/intl.dart';
 import 'package:settings/settings.dart';
 import 'package:vscode_for_android/terminal_page.dart';
 import 'behavior.dart';
@@ -13,7 +9,7 @@ import 'config.dart';
 
 Future<void> main() async {
   RuntimeEnvir.initEnvirWithPackageName('com.nightmare.code');
-  await initSettingStore(RuntimeEnvir.configPath!);
+  await initSettingStore(RuntimeEnvir.configPath);
   runApp(const MyApp());
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

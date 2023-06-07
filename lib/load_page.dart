@@ -1,7 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/src/foundation/key.dart';
-import 'package:flutter/src/widgets/container.dart';
-import 'package:flutter/src/widgets/framework.dart';
 import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
 import 'package:vscode_for_android/script.dart';
@@ -45,7 +42,7 @@ class _LoadPageState extends State<LoadPage> {
                 onPressed: () {
                   version = controller.text;
                   setState(() {});
-                  Get.to(TerminalPage());
+                  Get.to(const TerminalPage());
                 },
                 child: const Text('启动Code FA'),
               ),

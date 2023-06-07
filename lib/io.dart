@@ -5,11 +5,10 @@
 /// Helper functionality to make working with IO easier.
 import 'dart:async';
 import 'dart:collection';
-import 'dart:convert';
 import 'dart:io';
 import 'package:path/path.dart' as path;
 
-import 'third_party/tar/lib/tar.dart';
+import 'package:vscode_for_android/third_party/tar/lib/tar.dart';
 
 const _defaultMode = 420; // 644₈
 const _executableMask = 0x49; // 001 001 001
@@ -140,6 +139,12 @@ Future<String> createFileFromStream(
   deleteIfLink(file);
   await stream.pipe(File(file).openWrite());
   return file;
+}
+
+Stream<List<int>> readBinaryFileAsStream(String file) {
+  print('Reading binary file $file.');
+  var contents = File(file).openRead();
+  return contents;
 }
 
 /// Extracts a `.tar.gz` file from [stream] to [destination].
