@@ -8,40 +8,36 @@
 
 原理是运行 code-server 再使用 webview 加载视图，会有一些bug，但已经能有一些可观的表现。
 
-这个项目是开源的，上层框架是 Flutter，VS Code不是运行在 Flutter 中的，只有初始化的那个界面是。
+这个项目是开源的，上层框架是 Flutter，加载 VS Code 是在 Flutter 中实现，VS Code 运行在 Android WebView 中。
 
 工作比较忙，可能处理问题较慢，见谅。
 
 Cheers! 🍻
 
-## 一个坑
-code-server github release 中发布的 arm 版本的压缩包中存在硬链接，这部分文件解压到安卓上会失败。
-所以需要将下载的 gz 压缩包解压到电脑上，再压缩回去，带上 --hard-dereference 参数。
+## 功能特性
 
-**macOS 需要安装 gnu-tar，不然在安卓上解压会各种报错**
+- 完全本地运行的 Code Server
+- 支持最新4.13.0版本
+- 支持快速升级 Code-Server 版本
+- 支持自定义 Code-Server 版本
+- 支持无网络环境下运行
 
-brew install gnu-tar
+## 开始使用
 
-### 解压
-```
-gtar -zxvf code-server-4.12.0-linux-arm64.tar.gz
-```
-### 打包
+1.下载 [code-server-4.13.0-linux-arm64.tar.gz](https://github.com/coder/code-server/releases/download/v4.13.0/code-server-4.13.0-linux-arm64.tar.gz)
 
-```sh
-mv code-server-4.12.0-linux-arm64.tar.gz code-server-4.12.0-linux-arm64-old.tar.gz
-gtar --hard-dereference -zcvhf code-server-4.12.0-linux-arm64.tar.gz code-server-4.12.0-linux-arm64
-```
+2.将下载的文件放到 /sdcard，注意不用解压，不要更改他的文件名
 
-## Getting Started
+3.启动 Code FA，Engoy it!
 
-This project is a starting point for a Flutter application.
+## 更改 Code-Server 版本
 
-A few resources to get you started if this is your first Flutter project:
+1.在 /sdcard 中创建一个名为 `code_version` 的文件，文件内容为版本号，例如 `4.13.0`,不要有换行
 
-- [Lab: Write your first Flutter app](https://flutter.dev/docs/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://flutter.dev/docs/cookbook)
+2.下载对应的版本，放到 /sdcard 中，注意不用解压，不要更改它的文件名
 
-For help getting started with Flutter, view our
-[online documentation](https://flutter.dev/docs), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
+3.启动 Code FA，Engoy it!
+
+## 已知问题
+
+- 内置 WebView 对剪切板的适配不友好：可通过外部浏览器打开 127.0.0.1:10000 来绕过这个问题
