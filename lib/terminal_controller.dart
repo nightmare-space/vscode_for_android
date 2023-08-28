@@ -190,13 +190,6 @@ class HomeController extends GetxController {
           },
         ));
       }
-      Stopwatch stopwatch = Stopwatch()..start();
-      bool exist1 = await isLocalAsset('assets/bootstrap-aarch64.zip');
-      Log.i('exist1 $exist1 ${stopwatch.elapsedMilliseconds}');
-      bool exist2 = await isLocalAsset('assets/ubuntu-aarch64-pd-v3.0.1.tar.xz');
-      Log.i('exist2 $exist2 ${stopwatch.elapsedMilliseconds}');
-      bool exist3 = await isLocalAsset('assets/code-server-4.16.1-linux-arm64.tar.gz');
-      Log.i('exist3 $exist3 ${stopwatch.elapsedMilliseconds}');
       createPtyTerm();
     });
   }

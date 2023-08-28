@@ -15,5 +15,5 @@ class Config {
             done
             exit''';
 
-  static String versionName = '1.1.9';
+  static String versionName = '1.2.1';
 }
