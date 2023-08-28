@@ -7,9 +7,11 @@ import 'package:vscode_for_android/terminal_page.dart';
 import 'behavior.dart';
 import 'config.dart';
 
+
 Future<void> main() async {
   RuntimeEnvir.initEnvirWithPackageName('com.nightmare.code');
   await initSettingStore(RuntimeEnvir.configPath);
+
   runApp(const MyApp());
   SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
     statusBarColor: Colors.transparent,

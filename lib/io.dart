@@ -117,7 +117,7 @@ void createSymlink(String target, String symlink, {bool relative = false}) {
     }
   }
 
-  print('Creating $symlink pointing to $target');
+  // print('Creating $symlink pointing to $target');
   Link(symlink).createSync(target);
 }
 
