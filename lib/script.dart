@@ -81,6 +81,9 @@ $installVsCodeScript
 start_vs_code(){
   #install_ubuntu
   #install_vs_code
+  mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/home/ 2>/dev/null
+  chmod +x $ubuntuPath/home/code-server-$version-linux-arm64/bin/code-server
+  chmod +x $ubuntuPath/home/code-server-$version-linux-arm64/lib/node
   mkdir -p $ubuntuPath/root/.config/code-server 2>/dev/null
   echo '$source' > $ubuntuPath/etc/apt/sources.list
   echo '
