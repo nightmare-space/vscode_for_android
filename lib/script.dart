@@ -30,27 +30,6 @@ colorEcho(){
 }
 ''';
 
-// String installVsCodeScriptWithoutFullLinux = '''
-// $colorEcho
-// install_vs_code(){
-//   colorEcho - 安装依赖
-//   apt-get install -y libllvm
-//   apt-get install -y clang
-//   apt-get install -y nodejs
-//   apt-get install -y python
-//   apt-get install -y yarn
-//   colorEcho - 解压 Vs Code Arm64
-//   cd ~
-//   unzip code-server-3.11.1-linux-arm64.zip
-//   colorEcho - 执行 yarn install
-//   cd code-server-3.11.1-linux-arm64
-//   yarn config set registry https://registry.npm.taobao.org --global
-//   yarn config set disturl https://npm.taobao.org/dist --global
-//   npm config set registry https://registry.npm.taobao.org
-//   yarn install
-// }
-// ''';
-
 /// 安装ubuntu的shell
 String installUbuntu = '''
 install_ubuntu(){
@@ -72,7 +51,7 @@ install_ubuntu(){
   proot-distro install ubuntu >/dev/null 2>&1
   mv -f ./home $ubuntuPath/ >/dev/null 2>&1
   echo '$source' > $ubuntuPath/etc/apt/sources.list
-  echo 'export PATH=/home/code-server-$version-linux-arm64/bin:\$PATH' >> $ubuntuPath/root/.bashrc
+  echo 'export PATH=/opt/code-server-$version-linux-arm64/bin:\$PATH' >> $ubuntuPath/root/.bashrc
 }
 ''';
 
@@ -110,9 +89,14 @@ start_vs_code(){
   password: none
   cert: false
   ' > $ubuntuPath/root/.config/code-server/config.yaml
+  # 可能切换了版本，对应的code server被解压到app的home了
+  CODE_PATH=$ubuntuPath/opt/code-server-$version-linux-arm64
+  mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/opt/
+  chmod +x \$CODE_PATH/bin/code-server
+  chmod +x \$CODE_PATH/lib/node
+  chmod +x \$CODE_PATH/lib/vscode/node_modules/@vscode/ripgrep/bin/rg
   echo -e "\\033[31m- 启动中..\\033[0m"
-  proot-distro login ubuntu -- /home/code-server-$version-linux-arm64/bin/code-server
-  #proot-distro login ubuntu
+  proot-distro login ubuntu -- /opt/code-server-$version-linux-arm64/bin/code-server
 }
 ''';
 
@@ -149,9 +133,6 @@ function initApp(){
   rm -rf $lockFile
   export LD_PRELOAD=${RuntimeEnvir.usrPath}/lib/libtermux-exec.so
   install_ubuntu
-  mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/home/
-  chmod +x $ubuntuPath/home/code-server-$version-linux-arm64/bin/code-server
-  chmod +x $ubuntuPath/home/code-server-$version-linux-arm64/lib/node
   start_vs_code
   bash
 }

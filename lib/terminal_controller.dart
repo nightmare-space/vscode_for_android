@@ -10,7 +10,7 @@ import 'package:settings/settings.dart';
 import 'package:xterm/xterm.dart';
 
 import 'config.dart';
-import 'http_handler.dart';
+import 'utils/http_handler.dart';
 import 'io.dart';
 import 'script.dart';
 import 'utils/plugin_util.dart';
@@ -30,22 +30,29 @@ class HomeController extends GetxController {
     } catch (e) {
       Log.e(e);
     }
-    if (File('$ubuntuPath/home/code-server-$version-linux-arm64/bin/code-server').existsSync()) {
+    if (File('$ubuntuPath/opt/code-server-$version-linux-arm64/bin/code-server').existsSync()) {
       return;
     }
+    terminal.write('未发现这个版本的VS Code，解压中...\n\r');
     Log.i('未发现这个版本的VS Code，解压中...');
-    await extractTarGz(
-      readBinaryFileAsStream('/storage/emulated/0/code-server-$version-linux-arm64.tar.gz'),
-      RuntimeEnvir.homePath,
-      (data) {
-        // print(data);
-        terminal.write(data);
-      },
-    );
+    try {
+      await extractTarGz(
+        readBinaryFileAsStream('/storage/emulated/0/code-server-$version-linux-arm64.tar.gz'),
+        RuntimeEnvir.homePath,
+        (data) {
+          // print(data);
+          terminal.write(data);
+        },
+      );
+    } catch (e) {
+      terminal.write(e.toString());
+    }
+    terminal.write('\n\r');
   }
 
   /// 监听输出，当输出中包含vscode启动成功的标志时，启动vscode
   Future<void> vsCodeStartWhenSuccessBind() async {
+    terminal.write('监听VS Code启动状态以跳转Web View...\n\r');
     // WebView.platform = SurfaceAndroidWebView();
     final Completer completer = Completer();
     pseudoTerminal!.output.cast<List<int>>().transform(const Utf8Decoder(allowMalformed: true)).listen((event) async {
@@ -118,14 +125,13 @@ class HomeController extends GetxController {
     if (version.isEmpty) {
       version = '4.16.1';
     }
+    terminal.write('当前VS Code Server版本:$version...\n\r');
     // 创建相关文件夹
     Directory(RuntimeEnvir.tmpPath).createSync(recursive: true);
     Directory(RuntimeEnvir.homePath).createSync(recursive: true);
     Directory('$prootDistroPath/dlcache').createSync(recursive: true);
     Directory(RuntimeEnvir.binPath!).createSync(recursive: true);
-    String dioPath = '${RuntimeEnvir.binPath}/dart_dio';
-    File(dioPath).writeAsStringSync(Config.dioScript);
-    await exec('chmod +x $dioPath');
+
     // proot-distro 用来安装ubuntu
     await AssetsUtils.copyAssetToPath(
       'assets/proot-distro.zip',
@@ -136,13 +142,14 @@ class HomeController extends GetxController {
       'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',
       '$prootDistroPath/dlcache/ubuntu-aarch64-pd-v3.0.1.tar.xz',
     );
-    if (Platform.isAndroid) {
-      if (!hasBash()) {
-        initTerminal();
-        return;
-      }
+    if (!hasBash()) {
+      initTerminal();
+      return;
     }
+
+    terminal.write('创建PTY终端实例...\n\r');
     pseudoTerminal = createPTY();
+    terminal.write('定义需要使用的函数...\n\r');
 
     /// 定义需要使用的函数
     await pseudoTerminal?.defineFunction(startVsCodeScript);
@@ -155,6 +162,7 @@ class HomeController extends GetxController {
   Future<void> startVsCode(Pty pseudoTerminal) async {
     vsCodeStaring = true;
     update();
+    terminal.write('开始启动VS Code...\n\r');
     pseudoTerminal.writeString('''start_vs_code\n''');
   }
 
