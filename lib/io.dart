@@ -133,9 +133,7 @@ Future<String> createFileFromStream(
   String file,
   void Function(String data) print,
 ) async {
-  // print('\x1b7- $file.\x1b8');
-  print('\x1b[2K\r- ${path.basename(file)}.');
-
+  print('- ${path.basename(file)}.');
   deleteIfLink(file);
   await stream.pipe(File(file).openWrite());
   return file;

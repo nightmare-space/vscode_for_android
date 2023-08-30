@@ -1,7 +1,7 @@
 name: vscode_for_android
 description: A new Flutter project.
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.2.1+13
+version: 1.2.2+14
 environment:
   sdk: ">=2.12.0 <3.0.0"
 
