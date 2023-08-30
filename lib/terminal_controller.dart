@@ -25,12 +25,35 @@ class HomeController extends GetxController {
   Terminal terminal = Terminal();
   bool webviewHasOpen = false;
   Future<void> unzipVSCodeIfNotExist() async {
-    try {
-      AssetsUtils.copyAssetToPath('assets/code-server-4.16.1-linux-arm64.tar.gz', '/storage/emulated/0/code-server-4.16.1-linux-arm64.tar.gz');
-    } catch (e) {
-      Log.e(e);
+    // TODO 安卓13无法写入到外部储存
+    String appCodePath = '${RuntimeEnvir.homePath}/code-server-4.16.1-linux-arm64.tar.gz';
+    if (!File(appCodePath).existsSync()) {
+      terminal.write('拷贝App内4.16.1版本Code Server到数据目录...\n\r');
+      try {
+        await AssetsUtils.copyAssetToPath('assets/code-server-4.16.1-linux-arm64.tar.gz', appCodePath);
+      } catch (e) {
+        terminal.write(e.toString());
+        Log.e(e);
+      }
+    }
+    if (!File('$ubuntuPath/opt/code-server-$version-linux-arm64/bin/code-server').existsSync()) {
+      terminal.write('解压中$version到${RuntimeEnvir.homePath}\n\r');
+      try {
+        await extractTarGz(
+          readBinaryFileAsStream(appCodePath),
+          RuntimeEnvir.homePath,
+          (data) {
+            // print(data);
+            terminal.write('\x1b[J\x1b7$data\x1b8');
+          },
+        );
+        return;
+      } catch (e) {
+        terminal.write(e.toString());
+      }
     }
     if (File('$ubuntuPath/opt/code-server-$version-linux-arm64/bin/code-server').existsSync()) {
+      terminal.write('Ubuntu数据目录已存在$version的Code Server\n\r');
       return;
     }
     terminal.write('未发现这个版本的VS Code，解压中...\n\r');
@@ -41,7 +64,7 @@ class HomeController extends GetxController {
         RuntimeEnvir.homePath,
         (data) {
           // print(data);
-          terminal.write(data);
+          terminal.write('\x1b[2K\x1b7$data\x1b8');
         },
       );
     } catch (e) {
@@ -171,14 +194,14 @@ class HomeController extends GetxController {
     vsCodeStartWhenSuccessBind();
     await pseudoTerminal!.defineFunction(initShell);
     update();
-    terminal.write(getRedLog('\r\n- 解压资源中...\r\n'));
+    terminal.write(getRedLog('- 解压资源中...\r\n'));
 
     await AssetsUtils.copyAssetToPath(
       'assets/bootstrap-aarch64.zip',
       '${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip',
     );
     await ZipUtil.unzipBootstrap('${RuntimeEnvir.tmpPath}/bootstrap-aarch64.zip', onFile: (String name) {
-      terminal.write('\x1b[2K\r- ${path.basename(name)}.');
+      terminal.write('\x1b[2K\x1b7- ${path.basename(name)}.\x1b8');
     });
     terminal.write('\r\n');
     await unzipVSCodeIfNotExist();
