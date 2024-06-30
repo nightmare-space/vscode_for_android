@@ -1,43 +1,51 @@
 # Code FA
 
-这是一个使用 code-server 实现的 VS Code 安卓版。这个方案也有些人实现了，这里也是提供其中一种。
+Language: English | [中文简体](README-ZH.md)
 
-体积会比较大，由于所需要的资源都是整个运行初始化需要的，所以将资源集成到服务器，再动态下载的意义不大。
+This is an Android version of VS Code implemented using code-server. Some have already implemented similar solutions, and this is one of them.
 
-所以大家综合权衡这种方案与其他开发者的方案。
+The package size is relatively large since the resources required are necessary for the initial run, so integrating them into the server and dynamically downloading them is not very meaningful.
 
-原理是运行 code-server 再使用 webview 加载视图，会有一些bug，但已经能有一些可观的表现。
+Users should weigh this solution against others available from different developers.
 
-这个项目是开源的，上层框架是 Flutter，加载 VS Code 是在 Flutter 中实现，VS Code 运行在 Android WebView 中。
+The principle is to run code-server and then use a webview to load the view. There might be some bugs, but it performs reasonably well.
 
-工作比较忙，可能处理问题较慢，见谅。
+This project is open source, with the upper framework being Flutter. The loading of VS Code is implemented in Flutter, and VS Code runs in the Android WebView.
+
+I'm quite busy, so responses to issues might be slow. Thank you for your understanding.
 
 Cheers! 🍻
 
-## 功能特性
+## Features
 
-- 完全本地运行的 Code Server
-- 支持最新4.13.0版本
-- 支持快速升级 Code-Server 版本
-- 支持自定义 Code-Server 版本
-- 支持无网络环境下运行
+- Fully local operation of Code Server
+- Supports the latest version 4.13.0
+- Supports quick updates to Code-Server versions
+- Supports custom Code-Server versions
+- Can run without an internet connection
 
-## 开始使用
+## Getting Started
 
-1.下载 [code-server-4.13.0-linux-arm64.tar.gz](https://github.com/coder/code-server/releases/download/v4.13.0/code-server-4.13.0-linux-arm64.tar.gz)
+1. Download [code-server-4.13.0-linux-arm64.tar.gz](https://github.com/coder/code-server/releases/download/v4.13.0/code-server-4.13.0-linux-arm64.tar.gz)
 
-2.将下载的文件放到 /sdcard，注意不用解压，不要更改他的文件名
+2. Place the downloaded file in /sdcard. Do not unzip or change its filename.
 
-3.启动 Code FA，Engoy it!
+3. Launch Code FA, and enjoy it!
 
-## 更改 Code-Server 版本
+## Changing Code-Server Version
 
-1.在 /sdcard 中创建一个名为 `code_version` 的文件，文件内容为版本号，例如 `4.13.0`,不要有换行
+1. Create a file named `code_version` in /sdcard with the version number as its content, such as `4.13.0`, without any line breaks.
 
-2.下载对应的版本，放到 /sdcard 中，注意不用解压，不要更改它的文件名
+2. Download the corresponding version and place it in /sdcard. Do not unzip or change its filename.
 
-3.启动 Code FA，Engoy it!
+3. Launch Code FA, and enjoy it!
 
-## 已知问题
+## Known Issues
 
-- 内置 WebView 对剪切板的适配不友好：可通过外部浏览器打开 127.0.0.1:10000 来绕过这个问题
+- The built-in WebView does not handle the clipboard well: you can open 127.0.0.1:10000 in an external browser to bypass this issue.
+
+TODO: Like Sula, slide the sidebar to directly input pasted text.
+
+## Git History
+
+[![Star History Chart](https://api.star-history.com/svg?repos=nightmare-space/adb_kit&type=Date)](https://star-history.com/#nightmare-space/adb_kit&Date)
