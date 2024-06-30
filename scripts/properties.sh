@@ -1,3 +1,5 @@
-VERSION='1.1.6'
-TARGET_PATH=root@$server:/home/nightmare/YanTool/resources/VSCode
-APP_NAME='VSCode'
+VERSION='1.2.3'
+VERSION_CODE='15'
+TARGET_PATH=VSCode
+APP_NAME='CodeFA'
+APP_NAME_CN='CodeFA'
