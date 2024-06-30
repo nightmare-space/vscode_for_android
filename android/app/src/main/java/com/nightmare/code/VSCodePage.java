@@ -63,7 +63,7 @@ public class VSCodePage extends Activity {
         // 下面这行不写不得行
         mWebSettings.setDomStorageEnabled(true);
         mWebSettings.setDatabaseEnabled(true);
-        mWebSettings.setAppCacheEnabled(true);
+//        mWebSettings.setAppCacheEnabled(true);
         mWebSettings.setLoadWithOverviewMode(true);
         mWebSettings.setDefaultTextEncodingName("utf-8");
         mWebSettings.setLoadsImagesAutomatically(true);
@@ -79,7 +79,7 @@ public class VSCodePage extends Activity {
                 return true;
             }
         });
-        mWebView.loadUrl("http://127.0.0.1:10000");
+        mWebView.loadUrl("http://127.0.0.1:20000");
     }
 
     void checkState() {
