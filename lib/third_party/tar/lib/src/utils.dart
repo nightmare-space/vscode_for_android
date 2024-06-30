@@ -1,3 +1,4 @@
+// ignore: invalid_internal_annotation
 @internal
 import 'dart:async';
 import 'dart:convert';

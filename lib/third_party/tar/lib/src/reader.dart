@@ -675,6 +675,7 @@ class TarReader implements StreamIterator<TarEntry> {
   }
 }
 
+// ignore: invalid_internal_annotation
 @internal
 class PaxHeaders extends UnmodifiableMapBase<String, String> {
   final Map<String, String> _globalHeaders = {};

@@ -1,14 +1,13 @@
 import 'dart:async';
 import 'dart:convert';
 import 'dart:io';
-
+import 'package:archive/archive_io.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_pty/flutter_pty.dart';
 import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
 import 'package:settings/settings.dart';
 import 'package:xterm/xterm.dart';
-
 import 'config.dart';
 import 'utils/http_handler.dart';
 import 'io.dart';
@@ -22,15 +21,17 @@ import 'package:path/path.dart' as path;
 class HomeController extends GetxController {
   Pty? pseudoTerminal;
   bool vsCodeStaring = false;
-  Terminal terminal = Terminal();
+  Terminal terminal = Terminal(
+    maxLines: 10000,
+  );
   bool webviewHasOpen = false;
   Future<void> unzipVSCodeIfNotExist() async {
     // TODO 安卓13无法写入到外部储存
-    String appCodePath = '${RuntimeEnvir.homePath}/code-server-4.16.1-linux-arm64.tar.gz';
+    String appCodePath = '${RuntimeEnvir.homePath}/code-server-${Config.defaultCodeServerVersion}-linux-arm64.tar.gz';
     if (!File(appCodePath).existsSync()) {
-      terminal.write('拷贝App内4.16.1版本Code Server到数据目录...\n\r');
+      terminal.write('拷贝App内${Config.defaultCodeServerVersion}版本Code Server到数据目录...\n\r');
       try {
-        await AssetsUtils.copyAssetToPath('assets/code-server-4.16.1-linux-arm64.tar.gz', appCodePath);
+        await AssetsUtils.copyAssetToPath('assets/code-server-${Config.defaultCodeServerVersion}-linux-arm64.tar.gz', appCodePath);
       } catch (e) {
         terminal.write(e.toString());
         Log.e(e);
@@ -70,6 +71,7 @@ class HomeController extends GetxController {
     } catch (e) {
       terminal.write(e.toString());
     }
+
     terminal.write('\n\r');
   }
 
@@ -90,7 +92,7 @@ class HomeController extends GetxController {
         );
         return;
       }
-      if (event.contains('http://0.0.0.0:10000')) {
+      if (event.contains('http://0.0.0.0:${Config.port}')) {
         Log.e(event);
         if (!completer.isCompleted) {
           completer.complete();
@@ -139,14 +141,14 @@ class HomeController extends GetxController {
     try {
       if (!file.existsSync()) {
         file.createSync();
-        file.writeAsStringSync('4.16.1');
+        file.writeAsStringSync(Config.defaultCodeServerVersion);
       }
     } catch (e) {
       // 在小米平板6上会有异常，无法创建文件，怀疑是和Android系统有关
     }
     if (file.existsSync()) version = file.readAsStringSync();
     if (version.isEmpty) {
-      version = '4.16.1';
+      version = Config.defaultCodeServerVersion;
     }
     terminal.write('当前VS Code Server版本:$version...\n\r');
     // 创建相关文件夹
@@ -160,6 +162,27 @@ class HomeController extends GetxController {
       'assets/proot-distro.zip',
       '${RuntimeEnvir.homePath}/proot-distro.zip',
     );
+
+    final inputStream = InputFileStream('${RuntimeEnvir.homePath}/proot-distro.zip');
+    // Decode the zip from the InputFileStream. The archive will have the contents of the
+    // zip, without having stored the data in memory.
+    final archive = ZipDecoder().decodeBuffer(inputStream);
+    // For all of the entries in the archive
+    for (var file in archive.files) {
+      // If it's a file and not a directory
+      if (file.isFile) {
+        // Write the file content to a directory called 'out'.
+        // In practice, you should make sure file.name doesn't include '..' paths
+        // that would put it outside of the extraction directory.
+        // An OutputFileStream will write the data to disk.
+        final outputStream = OutputFileStream('${RuntimeEnvir.homePath}/${file.name}');
+        // The writeContent method will decompress the file content directly to disk without
+        // storing the decompressed data in memory.
+        file.writeContent(outputStream);
+        // Make sure to close the output stream so the File is closed.
+        outputStream.close();
+      }
+    }
     // ubuntu资源包
     await AssetsUtils.copyAssetToPath(
       'assets/ubuntu-aarch64-pd-v3.0.1.tar.xz',

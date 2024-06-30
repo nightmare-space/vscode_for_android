@@ -1,3 +1,4 @@
+// ignore: invalid_internal_annotation
 @internal
 import 'package:meta/meta.dart';
 

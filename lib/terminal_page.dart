@@ -25,11 +25,11 @@ class _TerminalPageState extends State<TerminalPage> {
       }
       return Scaffold(
         backgroundColor: Colors.black,
-        body: WillPopScope(
-          onWillPop: () async {
+        body: PopScope(
+          onPopInvoked: (didpop) {
             controller.pseudoTerminal!.writeString('\x03');
-            return true;
           },
+          canPop: true,
           child: Stack(
             children: [
               if (controller.pseudoTerminal != null)
