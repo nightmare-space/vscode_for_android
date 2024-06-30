@@ -87,6 +87,11 @@ android {
             dirs 'libs'
         }
     }
+    project.android.applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            output.versionCodeOverride = flutterVersionCode.toInteger()
+        }
+    }
 }
 
 flutter {
