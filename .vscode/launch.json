@@ -11,16 +11,6 @@
             "deviceId": "linux"
         },
         {
-            "name": "Chrome",
-            "request": "launch",
-            "type": "dart",
-            "deviceId": "chrome",
-            "args": [
-                "--web-renderer",
-                "html"
-            ]
-        },
-        {
             "name": "Mac Desktop",
             "request": "launch",
             "type": "dart",
@@ -33,34 +23,16 @@
             "deviceId": "windows"
         },
         {
-            "name": "小米平板5 12.4",
+            "name": "小米14",
             "request": "launch",
             "type": "dart",
-            "deviceId": "22081281AC"
+            "deviceId": "23127PN0CC",
         },
         {
-            "name": "小米10s",
+            "name": "小米平板6s",
             "request": "launch",
             "type": "dart",
-            "deviceId": "M2102J2SC"
-        },
-        {
-            "name": "小米12s",
-            "request": "launch",
-            "type": "dart",
-            "deviceId": "2206123SC"
-        },
-        {
-            "name": "小米13",
-            "request": "launch",
-            "type": "dart",
-            "deviceId": "2211133C"
-        },
-        {
-            "name": "小米平板6 PRO",
-            "request": "launch",
-            "type": "dart",
-            "deviceId": "23046RP50C"
+            "deviceId": "24018RPACC"
         },
     ]
 }

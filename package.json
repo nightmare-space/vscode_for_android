@@ -1,0 +1,13 @@
+{
+  "scripts": {
+    "Android: Run Release": "ni release -r",
+    "Android: Build Apk(Split Api)": "ni release -s",
+    "Android: Build AAB": "ni release -a",
+    "Mac: Install From Local Code": "ni release -m",
+    "Mac: Build Mac App": "ni release --build-mac",
+    "Mac: Generate Mac App(tar)": "ni release --gen-mac-app",
+    "Mac: Generate Mac App(dmg)": "ni release --build-mac-dmg",
+    "Default: Upload Build Package": "ni default -u",
+    "Default: Clean Build Cache": "ni release --clean-build"
+  }
+}
