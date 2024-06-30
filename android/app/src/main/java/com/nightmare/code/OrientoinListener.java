@@ -1,28 +1,24 @@
 package com.nightmare.code;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
-import android.content.Context;
 import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.OrientationEventListener;
 
-class MyOrientoinListener extends OrientationEventListener {
+class OrientoinListener extends OrientationEventListener {
     static final String TAG = "Nightmare";
     Activity context;
 
-    public MyOrientoinListener(Activity context) {
+    public OrientoinListener(Activity context) {
         super(context);
         this.context = context;
     }
 
-    public MyOrientoinListener(Activity context, int rate) {
-        super(context, rate);
-        this.context = context;
-    }
-
+    @SuppressLint("SourceLockedOrientationActivity")
     @Override
     public void onOrientationChanged(int orientation) {
-        Log.d(TAG, "orention" + orientation);
+//        Log.d(TAG, "orention" + orientation);
         int screenOrientation = context.getResources().getConfiguration().orientation;
         if (((orientation >= 0) && (orientation < 45)) || (orientation > 315)) {//设置竖屏
             if (screenOrientation != ActivityInfo.SCREEN_ORIENTATION_PORTRAIT && orientation != ActivityInfo.SCREEN_ORIENTATION_REVERSE_PORTRAIT) {

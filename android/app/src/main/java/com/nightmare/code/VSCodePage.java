@@ -2,35 +2,28 @@ package com.nightmare.code;
 
 import android.annotation.SuppressLint;
 import android.app.Activity;
+import android.content.ClipData;
+import android.content.ClipboardManager;
+import android.content.Context;
 import android.content.Intent;
 import android.database.ContentObserver;
-import android.graphics.Bitmap;
 import android.graphics.Color;
 import android.net.Uri;
-import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
-import android.util.Log;
 import android.view.Window;
-import android.view.WindowManager;
-import android.webkit.GeolocationPermissions;
+import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import androidx.annotation.NonNull;
-
-import com.nightmare.code.R;
-
-import io.flutter.plugin.platform.PlatformPlugin;
-
 public class VSCodePage extends Activity {
     WebView mWebView;
     Activity context;
-    MyOrientoinListener myOrientoinListener;
+    OrientoinListener myOrientoinListener;
 
     @SuppressLint("SetJavaScriptEnabled")
     @Override
@@ -38,7 +31,7 @@ public class VSCodePage extends Activity {
         super.onCreate(savedInstanceState);
         requestWindowFeature(Window.FEATURE_NO_TITLE);
         setContentView(R.layout.webview);
-        myOrientoinListener = new MyOrientoinListener(this);
+        myOrientoinListener = new OrientoinListener(this);
         checkState();
         getContentResolver().registerContentObserver(
                 Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION),
@@ -68,9 +61,25 @@ public class VSCodePage extends Activity {
         mWebSettings.setDefaultTextEncodingName("utf-8");
         mWebSettings.setLoadsImagesAutomatically(true);
         mWebSettings.setSupportMultipleWindows(true);
+        mWebView.addJavascriptInterface(new JavaScriptBridge(this), "Android");
         mWebView.setWebChromeClient(webChromeClient);
-        //系统默认会通过手机浏览器打开网页，为了能够直接通过WebView显示网页，则必须设置
+        // feat 剪切板内容获取的hook
         mWebView.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageFinished(WebView view, String url) {
+                // 注入JavaScript代码
+                String jsCode = "const originalReadText = navigator.clipboard.readText; " +
+                        "navigator.clipboard.readText = function () { " +
+                        "console.log('Intercepted clipboard read'); " +
+                        "return Android.getClipboardData(); " +
+                        "return originalReadText.call(navigator.clipboard).then(text => { " +
+                        "console.log('Clipboard content:', text); " +
+                        "return text; " +
+                        "}); " +
+                        "};";
+                view.evaluateJavascript(jsCode, null);
+            }
+
             @Override
             public boolean shouldOverrideUrlLoading(WebView view, String url) {
                 //使用WebView加载显示url
@@ -80,6 +89,24 @@ public class VSCodePage extends Activity {
             }
         });
         mWebView.loadUrl("http://127.0.0.1:20000");
+    }
+
+    public static class JavaScriptBridge {
+        Context mContext;
+
+        JavaScriptBridge(Context c) {
+            mContext = c;
+        }
+
+        @JavascriptInterface
+        public String getClipboardData() {
+            ClipboardManager clipboard = (ClipboardManager) mContext.getSystemService(Context.CLIPBOARD_SERVICE);
+            ClipData clip = clipboard.getPrimaryClip();
+            if (clip != null && clip.getItemCount() > 0) {
+                return clip.getItemAt(0).getText().toString();
+            }
+            return "";
+        }
     }
 
     void checkState() {
@@ -121,10 +148,4 @@ public class VSCodePage extends Activity {
         myOrientoinListener.disable();
     }
 
-    private ContentObserver mAutoTimeObserver = new ContentObserver(new Handler()) {
-        @Override
-        public void onChange(boolean selfChange) {
-
-        }
-    };
 }
