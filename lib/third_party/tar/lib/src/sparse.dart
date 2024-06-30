@@ -1,3 +1,4 @@
+// ignore: invalid_internal_annotation
 @internal
 import 'package:async/async.dart';
 import 'package:meta/meta.dart';
@@ -34,6 +35,7 @@ class SparseEntry {
 
 /// Generates a stream of the sparse file contents of size [size], given
 /// [sparseHoles] and the raw content in [source].
+// ignore: invalid_internal_annotation
 @internal
 Stream<List<int>> sparseStream(
     Stream<List<int>> source, List<SparseEntry> sparseHoles, int size) {

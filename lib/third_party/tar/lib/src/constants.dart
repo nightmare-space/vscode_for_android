@@ -1,3 +1,5 @@
+// ignore_for_file: invalid_internal_annotation, constant_identifier_names
+
 @internal
 import 'dart:typed_data';
 

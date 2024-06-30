@@ -182,6 +182,7 @@ abstract class TarHeader {
   TarHeader._();
 }
 
+// ignore: invalid_internal_annotation
 @internal
 class HeaderImpl extends TarHeader {
   TypeFlag internalTypeFlag;

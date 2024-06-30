@@ -32,11 +32,6 @@ class _XTermWrapperState extends State<XTermWrapper> {
     widget.terminal!.onResize = (width, height, pixelWidth, pixelHeight) {
       widget.pseudoTerminal!.resize(height, width);
     };
-    // streamSubscription ??= widget.pseudoTerminal.out.listen(
-    //   (String data) {
-    //     widget.terminal.write(data);
-    //   },
-    // );
   }
 
   @override
@@ -44,7 +39,6 @@ class _XTermWrapperState extends State<XTermWrapper> {
     return TerminalView(
       widget.terminal!,
       backgroundOpacity: 1,
-      keyboardType: TextInputType.multiline,
       theme: GetPlatform.isAndroid ? android : theme,
     );
   }

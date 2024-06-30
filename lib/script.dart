@@ -1,6 +1,8 @@
 // code-server版本号
 import 'package:global_repository/global_repository.dart';
 
+import 'config.dart';
+
 String version = '';
 // prootDistro 路径
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
@@ -31,13 +33,13 @@ colorEcho(){
 ''';
 
 /// 安装ubuntu的shell
+/// todo 内置proot，然后用dpkg安装
 String installUbuntu = '''
 install_ubuntu(){
   cd ~
   colorEcho - 安装Ubuntu Linux
-  unzip -o proot-distro.zip >/dev/null
   cd ~/proot-distro-master
-  bash ./install.sh >/dev/null 2>&1
+  bash ./install.sh
   apt-get install -y proot >/dev/null
   old=`cat $ubuntuPath/etc/issue 2>/dev/null`
   #echo \$old
@@ -52,6 +54,7 @@ install_ubuntu(){
   mv -f ./home $ubuntuPath/ >/dev/null 2>&1
   echo '$source' > $ubuntuPath/etc/apt/sources.list
   echo 'export PATH=/opt/code-server-$version-linux-arm64/bin:\$PATH' >> $ubuntuPath/root/.bashrc
+  echo 'export ANDROID_DATA=/home/' >> $ubuntuPath/root/.bashrc
 }
 ''';
 
@@ -73,30 +76,30 @@ install_vs_code(){
 }
 ''';
 
-// TODO 加上端口的kill
+/// TODO 加上端口的kill
 /// 启动 vs code 的shell
 String startVsCodeScript = '''
 $installUbuntu
 $installVsCodeScript
 start_vs_code(){
-  #install_ubuntu
+  install_ubuntu
   #install_vs_code
   mkdir -p $ubuntuPath/root/.config/code-server 2>/dev/null
   echo '$source' > $ubuntuPath/etc/apt/sources.list
   echo '
-  bind-addr: 0.0.0.0:10000
+  bind-addr: 0.0.0.0:${Config.port}
   auth: none
   password: none
   cert: false
   ' > $ubuntuPath/root/.config/code-server/config.yaml
   # 可能切换了版本，对应的code server被解压到app的home了
   CODE_PATH=$ubuntuPath/opt/code-server-$version-linux-arm64
-  mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/opt/
+  mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/opt/ 2>/dev/null
   chmod +x \$CODE_PATH/bin/code-server
   chmod +x \$CODE_PATH/lib/node
   chmod +x \$CODE_PATH/lib/vscode/node_modules/@vscode/ripgrep/bin/rg
   echo -e "\\033[31m- 启动中..\\033[0m"
-  proot-distro login ubuntu -- /opt/code-server-$version-linux-arm64/bin/code-server
+  proot-distro  login --bind /sdcard:/sd --bind /storage/emulated/0:/storage/emulated/0/ ubuntu  -- /opt/code-server-$version-linux-arm64/bin/code-server
 }
 ''';
 
