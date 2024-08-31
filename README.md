@@ -42,7 +42,7 @@ Cheers! 🍻
 
 ## Known Issues
 
-- The built-in WebView does not handle the clipboard well: you can open 127.0.0.1:10000 in an external browser to bypass this issue.
+- The built-in WebView does not handle the clipboard well: you can open 127.0.0.1:20000 in an external browser to bypass this issue.
 
 TODO: Like Sula, slide the sidebar to directly input pasted text.
 
