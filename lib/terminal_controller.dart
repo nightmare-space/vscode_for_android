@@ -25,55 +25,55 @@ class HomeController extends GetxController {
     maxLines: 10000,
   );
   bool webviewHasOpen = false;
-  Future<void> unzipVSCodeIfNotExist() async {
-    // TODO 安卓13无法写入到外部储存
-    String appCodePath = '${RuntimeEnvir.homePath}/code-server-${Config.defaultCodeServerVersion}-linux-arm64.tar.gz';
-    if (!File(appCodePath).existsSync()) {
-      terminal.write('拷贝App内${Config.defaultCodeServerVersion}版本Code Server到数据目录...\n\r');
-      try {
-        await AssetsUtils.copyAssetToPath('assets/code-server-${Config.defaultCodeServerVersion}-linux-arm64.tar.gz', appCodePath);
-      } catch (e) {
-        terminal.write(e.toString());
-        Log.e(e);
-      }
-    }
-    if (!File('$ubuntuPath/opt/code-server-$version-linux-arm64/bin/code-server').existsSync()) {
-      terminal.write('解压中$version到${RuntimeEnvir.homePath}\n\r');
-      try {
-        await extractTarGz(
-          readBinaryFileAsStream(appCodePath),
-          RuntimeEnvir.homePath,
-          (data) {
-            // print(data);
-            terminal.write('\x1b[J\x1b7$data\x1b8');
-          },
-        );
-        return;
-      } catch (e) {
-        terminal.write(e.toString());
-      }
-    }
-    if (File('$ubuntuPath/opt/code-server-$version-linux-arm64/bin/code-server').existsSync()) {
-      terminal.write('Ubuntu数据目录已存在$version的Code Server\n\r');
-      return;
-    }
-    terminal.write('未发现这个版本的VS Code，解压中...\n\r');
-    Log.i('未发现这个版本的VS Code，解压中...');
-    try {
-      await extractTarGz(
-        readBinaryFileAsStream('/storage/emulated/0/code-server-$version-linux-arm64.tar.gz'),
-        RuntimeEnvir.homePath,
-        (data) {
-          // print(data);
-          terminal.write('\x1b[2K\x1b7$data\x1b8');
-        },
-      );
-    } catch (e) {
-      terminal.write(e.toString());
-    }
+  // Future<void> unzipVSCodeIfNotExist() async {
+  //   // TODO 安卓13无法写入到外部储存
+  //   String appCodePath = '${RuntimeEnvir.homePath}/code-server-${Config.defaultCodeServerVersion}-linux-arm64.tar.gz';
+  //   if (!File(appCodePath).existsSync()) {
+  //     terminal.write('拷贝App内${Config.defaultCodeServerVersion}版本Code Server到数据目录...\n\r');
+  //     try {
+  //       await AssetsUtils.copyAssetToPath('assets/code-server-${Config.defaultCodeServerVersion}-linux-arm64.tar.gz', appCodePath);
+  //     } catch (e) {
+  //       terminal.write(e.toString());
+  //       Log.e(e);
+  //     }
+  //   }
+  //   if (!File('$ubuntuPath/opt/code-server-$version-linux-arm64/bin/code-server').existsSync()) {
+  //     terminal.write('解压中$version到${RuntimeEnvir.homePath}\n\r');
+  //     try {
+  //       await extractTarGz(
+  //         readBinaryFileAsStream(appCodePath),
+  //         RuntimeEnvir.homePath,
+  //         (data) {
+  //           // print(data);
+  //           terminal.write('\x1b[J\x1b7$data\x1b8');
+  //         },
+  //       );
+  //       return;
+  //     } catch (e) {
+  //       terminal.write(e.toString());
+  //     }
+  //   }
+  //   if (File('$ubuntuPath/opt/code-server-$version-linux-arm64/bin/code-server').existsSync()) {
+  //     terminal.write('Ubuntu数据目录已存在$version的Code Server\n\r');
+  //     return;
+  //   }
+  //   terminal.write('未发现这个版本的VS Code，解压中...\n\r');
+  //   Log.i('未发现这个版本的VS Code，解压中...');
+  //   try {
+  //     await extractTarGz(
+  //       readBinaryFileAsStream('/storage/emulated/0/code-server-$version-linux-arm64.tar.gz'),
+  //       RuntimeEnvir.homePath,
+  //       (data) {
+  //         // print(data);
+  //         terminal.write('\x1b[2K\x1b7$data\x1b8');
+  //       },
+  //     );
+  //   } catch (e) {
+  //     terminal.write(e.toString());
+  //   }
 
-    terminal.write('\n\r');
-  }
+  //   terminal.write('\n\r');
+  // }
 
   /// 监听输出，当输出中包含vscode启动成功的标志时，启动vscode
   Future<void> vsCodeStartWhenSuccessBind() async {
@@ -201,7 +201,7 @@ class HomeController extends GetxController {
     await pseudoTerminal?.defineFunction(startVsCodeScript);
     update();
     vsCodeStartWhenSuccessBind();
-    await unzipVSCodeIfNotExist();
+    //await unzipVSCodeIfNotExist();
     startVsCode(pseudoTerminal!);
   }
 
@@ -227,7 +227,7 @@ class HomeController extends GetxController {
       terminal.write('\x1b[2K\x1b7- ${path.basename(name)}.\x1b8');
     });
     terminal.write('\r\n');
-    await unzipVSCodeIfNotExist();
+    //await unzipVSCodeIfNotExist();
     pseudoTerminal!.writeString('initApp\n');
   }
 

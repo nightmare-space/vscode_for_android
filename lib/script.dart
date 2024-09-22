@@ -4,6 +4,7 @@ import 'package:global_repository/global_repository.dart';
 import 'config.dart';
 
 String version = '';
+String commit_id = '38c31bc77e0dd6ae88a4e9cc93428cc27a56ba40';
 // prootDistro 路径
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
 // ubuntu 路径
@@ -53,7 +54,6 @@ install_ubuntu(){
   proot-distro install ubuntu >/dev/null 2>&1
   mv -f ./home $ubuntuPath/ >/dev/null 2>&1
   echo '$source' > $ubuntuPath/etc/apt/sources.list
-  echo 'export PATH=/opt/code-server-$version-linux-arm64/bin:\$PATH' >> $ubuntuPath/root/.bashrc
   echo 'export ANDROID_DATA=/home/' >> $ubuntuPath/root/.bashrc
 }
 ''';
@@ -62,17 +62,11 @@ install_ubuntu(){
 String installVsCodeScript = '''
 $colorEcho
 install_vs_code(){
-  if [ ! -d "$ubuntuPath/home/code-server-$version-linux-arm64" ];then
+
+    colorEcho - 安装Vscode_cli
     cd $ubuntuPath/home
-    server_path="/sdcard/code-server-$version-linux-arm64.tar.gz"
-    if [ ! -f "\$server_path" ];then
-      echo "没有发现外置包，请到http://nightmare.press:5244/AliYun下载外置包"
-    else
-      colorEcho - 解压 Vs Code Arm64
-      tar zxvfh \$server_path > /dev/null
-      cd code-server-$version-linux-arm64
-    fi
-  fi
+    curl -L -o vscode_cli_alpine_arm64_cli.tar.gz https://vscode.download.prss.microsoft.com/dbazure/download/stable/$commit_id/vscode_cli_alpine_arm64_cli.tar.gz
+    tar -zxvf vscode_cli_alpine_arm64_cli.tar.gz -C $ubuntuPath/home/
 }
 ''';
 
@@ -83,7 +77,7 @@ $installUbuntu
 $installVsCodeScript
 start_vs_code(){
   install_ubuntu
-  #install_vs_code
+  install_vs_code
   mkdir -p $ubuntuPath/root/.config/code-server 2>/dev/null
   echo '$source' > $ubuntuPath/etc/apt/sources.list
   echo '
@@ -92,14 +86,15 @@ start_vs_code(){
   password: none
   cert: false
   ' > $ubuntuPath/root/.config/code-server/config.yaml
-  # 可能切换了版本，对应的code server被解压到app的home了
-  CODE_PATH=$ubuntuPath/opt/code-server-$version-linux-arm64
-  mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/opt/ 2>/dev/null
-  chmod +x \$CODE_PATH/bin/code-server
-  chmod +x \$CODE_PATH/lib/node
-  chmod +x \$CODE_PATH/lib/vscode/node_modules/@vscode/ripgrep/bin/rg
+  echo 'apt update 
+  apt install -y wget 
+  /home/code serve-web --host 0.0.0.0 --without-connection-token --accept-server-license-terms --log trace --verbose' > $ubuntuPath/home/start.sh
+  chmod +x $ubuntuPath/home/start.sh
+  chmod +x $ubuntuPath/home/code
   echo -e "\\033[31m- 启动中..\\033[0m"
-  proot-distro  login --bind /sdcard:/sd --bind /storage/emulated/0:/storage/emulated/0/ ubuntu  -- /opt/code-server-$version-linux-arm64/bin/code-server
+
+  proot-distro  login --bind /sdcard:/sd --bind /storage/emulated/0:/storage/emulated/0/ ubuntu  -- /home/start.sh
+  
 }
 ''';
 
