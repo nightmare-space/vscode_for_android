@@ -88,7 +88,7 @@ public class VSCodePage extends Activity {
                 return true;
             }
         });
-        mWebView.loadUrl("http://127.0.0.1:20000");
+        mWebView.loadUrl("http://127.0.0.1:8000");
     }
 
     public static class JavaScriptBridge {
