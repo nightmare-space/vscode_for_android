@@ -1,0 +1,6 @@
+[submodule "global_repository"]
+	path = global_repository
+	url = https://github.com/brian200508/global_repository
+[submodule "settings"]
+	path = settings
+	url = https://github.com/nightmare-space/settings
