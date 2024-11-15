@@ -45,16 +45,6 @@ jobs:
       - name: Build APK
         run: flutter build apk --release --split-per-abi
 
-      - name: Build appBundle
-        run: flutter build appbundle
-
-      - name: Upload Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: Releases
-          path: |
-            build/app/outputs/apk/release/*-arm64-*.apk
-
       - name: Extract version from pubspec.yaml
         id: extract_version
         run: |
@@ -77,9 +67,22 @@ jobs:
           new_version="${{ env.VERSION }}-build-${{ github.run_number }}"
           echo "VERSION=$new_version" >> $GITHUB_ENV
 
+      - name: Rename Artifacts 
+        run: |
+          mv build/app/outputs/apk/release/app-arm64-*-release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_arm64.apk"
+          mv build/app/outputs/apk/release/app-armeabi-*-release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_arm_v7a.apk"
+          mv build/app/outputs/apk/release/app-x86_64-*-release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_x86_64.apk"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Releases
+          path: |
+            build/app/outputs/apk/release/*_arm64.apk
+
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/apk/release/*-arm64-*.apk"
+          artifacts: "build/app/outputs/apk/release/*_arm64.apk"
           tag: v${{ env.VERSION }}
           token: ${{ secrets.TOKEN }}
