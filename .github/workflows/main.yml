@@ -69,9 +69,9 @@ jobs:
 
       - name: Rename Artifacts 
         run: |
-          mv build/app/outputs/apk/release/app-arm64-*-release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_arm64.apk"
-          mv build/app/outputs/apk/release/app-armeabi-*-release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_arm_v7a.apk"
-          mv build/app/outputs/apk/release/app-x86_64-*-release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_x86_64.apk"
+          mv build/app/outputs/apk/release/app-arm64-*release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_arm64.apk"
+          mv build/app/outputs/apk/release/app-armeabi-*release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_arm_v7a.apk"
+          mv build/app/outputs/apk/release/app-x86_64-*release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_x86_64.apk"
 
       - name: Upload Artifacts
         uses: actions/upload-artifact@v3
