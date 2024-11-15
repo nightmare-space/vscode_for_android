@@ -53,7 +53,7 @@ jobs:
         with:
           name: Releases
           path: |
-            build/app/outputs/apk/release/*.apk
+            build/app/outputs/apk/release/*-arm64-*.apk
             build/app/outputs/bundle/release/app-release.aab
 
       - name: Extract version from pubspec.yaml
@@ -81,6 +81,6 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/app-release.aab"
+          artifacts: "build/app/outputs/apk/release/*-arm64-*.apk"
           tag: v${{ env.VERSION }}
           token: ${{ secrets.TOKEN }}
