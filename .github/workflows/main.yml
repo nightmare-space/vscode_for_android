@@ -62,17 +62,17 @@ jobs:
           version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
           echo "VERSION=$version" >> $GITHUB_ENV
 
-      - name: Check if Tag Exists
-        id: check_tag
-        run: |
-          if git rev-parse "${{ env.VERSION }}" >/dev/null 2>&1; then
-            echo "TAG_EXISTS=true" >> $GITHUB_ENV
-          else
-            echo "TAG_EXISTS=false" >> $GITHUB_ENV
-          fi
+#FIXME:      - name: Check if Tag Exists
+#FIXME:        id: check_tag
+#FIXME:        run: |
+#FIXME:          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+#FIXME:            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+#FIXME:          else
+#FIXME:            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+#FIXME:          fi
 
       - name: Modify Tag
-        if: env.TAG_EXISTS == 'true'
+#FIXME:        if: env.TAG_EXISTS == 'true'
         id: modify_tag
         run: |
           new_version="${{ env.VERSION }}-build-${{ github.run_number }}"
