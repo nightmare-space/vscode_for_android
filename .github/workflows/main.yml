@@ -43,7 +43,7 @@ jobs:
           echo "storeFile=keystore.jks" >> android/key.properties
 
       - name: Build APK
-        run: flutter build apk --release
+        run: flutter build apk --release --split-per-abi
 
       - name: Build appBundle
         run: flutter build appbundle
@@ -53,7 +53,7 @@ jobs:
         with:
           name: Releases
           path: |
-            build/app/outputs/flutter-apk/app-release.apk
+            build/app/outputs/apk/release/*.apk
             build/app/outputs/bundle/release/app-release.aab
 
       - name: Extract version from pubspec.yaml
@@ -81,6 +81,6 @@ jobs:
       - name: Create Release
         uses: ncipollo/release-action@v1
         with:
-          artifacts: "build/app/outputs/flutter-apk/app-release.apk,build/app/outputs/bundle/release/app-release.aab"
+          artifacts: "build/app/outputs/apk/release/*.apk,build/app/outputs/bundle/release/app-release.aab"
           tag: v${{ env.VERSION }}
           token: ${{ secrets.TOKEN }}
