@@ -4,8 +4,7 @@ import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
 import 'package:settings/settings.dart';
 import 'package:vscode_for_android/terminal_page.dart';
-import 'behavior.dart';
-import 'config.dart';
+//FIXME: import 'behavior.dart';
 
 
 Future<void> main() async {
@@ -18,11 +17,11 @@ Future<void> main() async {
     systemNavigationBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,
   ));
-  initApi('Code FA', Config.versionName);
+  //FIXME: initApi('Code FA', Config.versionName);
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+  const MyApp({super.key});
 
   // This widget is the root of your application.
   @override

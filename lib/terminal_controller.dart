@@ -14,7 +14,6 @@ import 'io.dart';
 import 'script.dart';
 import 'utils/plugin_util.dart';
 import 'utils/pty_util.dart';
-import 'utils/extension.dart';
 import 'utils/zip_util.dart';
 import 'package:path/path.dart' as path;
 
@@ -155,7 +154,7 @@ class HomeController extends GetxController {
     Directory(RuntimeEnvir.tmpPath).createSync(recursive: true);
     Directory(RuntimeEnvir.homePath).createSync(recursive: true);
     Directory('$prootDistroPath/dlcache').createSync(recursive: true);
-    Directory(RuntimeEnvir.binPath!).createSync(recursive: true);
+    Directory(RuntimeEnvir.binPath).createSync(recursive: true);
 
     // proot-distro 用来安装ubuntu
     await AssetsUtils.copyAssetToPath(
@@ -198,7 +197,8 @@ class HomeController extends GetxController {
     terminal.write('定义需要使用的函数...\n\r');
 
     /// 定义需要使用的函数
-    await pseudoTerminal?.defineFunction(startVsCodeScript);
+    Uint8List bytesStartVsCodeScript = utf8.encode(startVsCodeScript);
+    pseudoTerminal!.write(bytesStartVsCodeScript);
     update();
     vsCodeStartWhenSuccessBind();
     await unzipVSCodeIfNotExist();
@@ -209,13 +209,15 @@ class HomeController extends GetxController {
     vsCodeStaring = true;
     update();
     terminal.write('开始启动VS Code...\n\r');
-    pseudoTerminal.writeString('''start_vs_code\n''');
+    Uint8List bytesStartVSCode = utf8.encode('''start_vs_code\n''');
+    pseudoTerminal.write(bytesStartVSCode);
   }
 
   Future<void> initTerminal() async {
     pseudoTerminal = createPTY(shell: '/system/bin/sh');
     vsCodeStartWhenSuccessBind();
-    await pseudoTerminal!.defineFunction(initShell);
+    Uint8List bytesInitShell = utf8.encode(initShell);
+    pseudoTerminal!.write(bytesInitShell);
     update();
     terminal.write(getRedLog('- 解压资源中...\r\n'));
 
@@ -228,7 +230,8 @@ class HomeController extends GetxController {
     });
     terminal.write('\r\n');
     await unzipVSCodeIfNotExist();
-    pseudoTerminal!.writeString('initApp\n');
+    Uint8List bytesInitApp = utf8.encode('initApp\n');
+    pseudoTerminal!.write(bytesInitApp);
   }
 
   @override

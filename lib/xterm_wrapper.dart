@@ -8,10 +8,10 @@ import 'package:xterm/xterm.dart';
 
 class XTermWrapper extends StatefulWidget {
   const XTermWrapper({
-    Key? key,
+    super.key,
     required this.terminal,
     required this.pseudoTerminal,
-  }) : super(key: key);
+  });
   final Terminal? terminal;
   final Pty? pseudoTerminal;
 

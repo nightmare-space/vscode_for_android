@@ -2,7 +2,7 @@
 ///
 /// To read tar files, see [TarReader]. To write tar files, use [tarWritingSink]
 ///  or [tarWriter].
-library tar;
+library;
 
 // For dartdoc.
 import 'src/reader.dart';

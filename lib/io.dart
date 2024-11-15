@@ -5,6 +5,8 @@
 // ignore_for_file: avoid_print
 
 /// Helper functionality to make working with IO easier.
+library;
+
 import 'dart:async';
 import 'dart:collection';
 import 'dart:io';

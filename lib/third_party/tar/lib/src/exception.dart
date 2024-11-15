@@ -4,7 +4,7 @@ import 'package:meta/meta.dart';
 /// Intended to be seen by the user.
 class TarException extends FormatException {
   @internal
-  TarException(String message) : super(message);
+  TarException(super.message);
 
   @internal
   factory TarException.header(String message) {
