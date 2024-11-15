@@ -54,7 +54,6 @@ jobs:
           name: Releases
           path: |
             build/app/outputs/apk/release/*-arm64-*.apk
-            build/app/outputs/bundle/release/app-release.aab
 
       - name: Extract version from pubspec.yaml
         id: extract_version
