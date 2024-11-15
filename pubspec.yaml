@@ -27,7 +27,7 @@ dependencies:
   flutter_pty:
     git: https://github.com/TerminalStudio/flutter_pty
   global_repository:
-    git: https://github.com/brian200508/global_repository
+    git: https://github.com/nightmare-space/global_repository
   path: ^1.8.0
   device_info_plus: ^11.1.1
   meta: ^1.11.0
