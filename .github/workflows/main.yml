@@ -51,7 +51,7 @@ jobs:
           echo "storeFile=keystore.jks" >> android/key.properties
 
       - name: Build APK
-        run: flutter build apk --release --split-per-abi
+        run: flutter build apk --release --split-per-abi --dart-define=VERSION=${{ env.VERSION }} --dart-define=CSVERSION=${{ env.CSVERSION }}
 
 #FIXME:      - name: Check if Tag Exists
 #FIXME:        id: check_tag
