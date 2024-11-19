@@ -13,8 +13,16 @@ jobs:
       - name: Checkout Repository
         uses: actions/checkout@v3
 
+      - name: Extract version from pubspec.yaml
+        id: extract_version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+          code_server=$(grep '^code_server: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "CSVERSION=$code_server" >> $GITHUB_ENV
+
       - name: Download code-server
-        run:  wget -O assets/code-server-4.95.2-linux-arm64.tar.gz https://github.com/coder/code-server/releases/download/v4.95.2/code-server-4.95.2-linux-arm64.tar.gz
+        run:  wget -O assets/code-server-${{ env.CSVERSION }}-linux-arm64.tar.gz https://github.com/coder/code-server/releases/download/v${{ env.CSVERSION }}/code-server-${{ env.CSVERSION }}-linux-arm64.tar.gz
 
       - name: Set Up Java
         uses: actions/setup-java@v3.12.0
@@ -44,12 +52,6 @@ jobs:
 
       - name: Build APK
         run: flutter build apk --release --split-per-abi
-
-      - name: Extract version from pubspec.yaml
-        id: extract_version
-        run: |
-          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
-          echo "VERSION=$version" >> $GITHUB_ENV
 
 #FIXME:      - name: Check if Tag Exists
 #FIXME:        id: check_tag
