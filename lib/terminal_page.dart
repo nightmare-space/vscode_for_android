@@ -8,7 +8,7 @@ import 'utils/plugin_util.dart';
 import 'xterm_wrapper.dart';
 
 class TerminalPage extends StatefulWidget {
-  const TerminalPage({Key? key}) : super(key: key);
+  const TerminalPage({super.key});
 
   @override
   State<TerminalPage> createState() => _TerminalPageState();

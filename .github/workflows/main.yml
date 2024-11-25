@@ -1,0 +1,90 @@
+name: "Build & Release"
+# see https://medium.com/@colonal/automating-flutter-builds-and-releases-with-github-actions-77ccf4a1ccdd
+
+on:
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build & Release
+    runs-on: ubuntu-latest
+    steps:
+
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      - name: Extract version from pubspec.yaml
+        id: extract_version
+        run: |
+          version=$(grep '^version: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "VERSION=$version" >> $GITHUB_ENV
+          code_server=$(grep '^code_server: ' pubspec.yaml | cut -d ' ' -f 2 | tr -d '\r')
+          echo "CSVERSION=$code_server" >> $GITHUB_ENV
+
+      - name: Download code-server
+        run:  wget -O assets/code-server-${{ env.CSVERSION }}-linux-arm64.tar.gz https://github.com/coder/code-server/releases/download/v${{ env.CSVERSION }}/code-server-${{ env.CSVERSION }}-linux-arm64.tar.gz
+
+      - name: Set Up Java
+        uses: actions/setup-java@v3.12.0
+        with:
+          distribution: 'oracle'
+          java-version: '17'
+
+      - name: Set Up Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: '3.24.4'
+          channel: 'stable'
+
+      - name: Install Dependencies
+        run: flutter pub get
+
+      - name: Decode Keystore
+        run: |
+          echo "${{ secrets.KEYSTORE_BASE64 }}" | base64 --decode > android/app/keystore.jks
+
+      - name: Create key.properties
+        run: |
+          echo "storePassword=${{ secrets.KEYSTORE_PASSWORD }}" > android/key.properties
+          echo "keyPassword=${{ secrets.KEY_PASSWORD }}" >> android/key.properties
+          echo "keyAlias=${{ secrets.KEY_ALIAS }}" >> android/key.properties
+          echo "storeFile=keystore.jks" >> android/key.properties
+
+      - name: Build APK
+        run: flutter build apk --release --split-per-abi --dart-define=VERSION=${{ env.VERSION }} --dart-define=CSVERSION=${{ env.CSVERSION }}
+
+#FIXME:      - name: Check if Tag Exists
+#FIXME:        id: check_tag
+#FIXME:        run: |
+#FIXME:          if git rev-parse "v${{ env.VERSION }}" >/dev/null 2>&1; then
+#FIXME:            echo "TAG_EXISTS=true" >> $GITHUB_ENV
+#FIXME:          else
+#FIXME:            echo "TAG_EXISTS=false" >> $GITHUB_ENV
+#FIXME:          fi
+
+      - name: Modify Tag
+#FIXME:        if: env.TAG_EXISTS == 'true'
+        id: modify_tag
+        run: |
+          new_version="${{ env.VERSION }}-build-${{ github.run_number }}"
+          echo "VERSION=$new_version" >> $GITHUB_ENV
+
+      - name: Rename Artifacts 
+        run: |
+          mv build/app/outputs/apk/release/app-arm64-*release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_arm64.apk"
+          mv build/app/outputs/apk/release/app-armeabi-*release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_arm_v7a.apk"
+          mv build/app/outputs/apk/release/app-x86_64-*release.apk "build/app/outputs/apk/release/CodeFA_${{ env.VERSION }}_Android_x86_64.apk"
+
+      - name: Upload Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: Releases
+          path: |
+            build/app/outputs/apk/release/*_arm64.apk
+
+      - name: Create Release
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: "build/app/outputs/apk/release/*_arm64.apk"
+          tag: v${{ env.VERSION }}
+          token: ${{ secrets.TOKEN }}

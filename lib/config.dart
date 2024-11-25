@@ -4,9 +4,9 @@ class Config {
   /// 包名
   static const String packageName = 'com.nightmare.code';
 
-  static String versionName = '1.2.2';
+  static const String versionName = String.fromEnvironment('VERSION');
 
   static int port = 20000;
 
-  static String defaultCodeServerVersion = '4.90.3';
+  static const String defaultCodeServerVersion = String.fromEnvironment('CSVERSION');
 }
