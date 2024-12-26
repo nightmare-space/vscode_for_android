@@ -209,9 +209,11 @@ packages:
   global_repository:
     dependency: "direct main"
     description:
-      path: global_repository
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "641a4debe7bb1e2259216506277a4896f6f6c94f"
+      url: "https://github.com/nightmare-space/global_repository"
+    source: git
     version: "0.0.1"
   hive:
     dependency: transitive
@@ -392,9 +394,11 @@ packages:
   settings:
     dependency: "direct main"
     description:
-      path: settings
-      relative: true
-    source: path
+      path: "."
+      ref: HEAD
+      resolved-ref: "1d683a15da1d2e4c1732b87d2da5c89c21a6b38b"
+      url: "https://github.com/nightmare-space/settings"
+    source: git
     version: "0.0.1"
   signale:
     dependency: "direct main"
