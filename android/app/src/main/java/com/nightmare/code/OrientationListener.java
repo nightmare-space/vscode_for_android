@@ -6,11 +6,11 @@ import android.content.pm.ActivityInfo;
 import android.util.Log;
 import android.view.OrientationEventListener;
 
-class OrientoinListener extends OrientationEventListener {
+class OrientationListener extends OrientationEventListener {
     static final String TAG = "Nightmare";
     Activity context;
 
-    public OrientoinListener(Activity context) {
+    public OrientationListener(Activity context) {
         super(context);
         this.context = context;
     }
