@@ -1,3 +1,4 @@
 {
-    "cmake.configureOnOpen": false
+    "editor.formatOnSave": true,
+    "dart.lineLength": 200
 }
