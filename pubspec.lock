@@ -216,11 +216,9 @@ packages:
   global_repository:
     dependency: "direct main"
     description:
-      path: "."
-      ref: HEAD
-      resolved-ref: f3dcc7d6e7dc140cbaf68028cd60503828a2eca6
-      url: "https://github.com/nightmare-space/global_repository"
-    source: git
+      path: "/Users/nightmare/Desktop/nightmare-space/global_repository"
+      relative: false
+    source: path
     version: "0.0.1"
   hive:
     dependency: transitive
