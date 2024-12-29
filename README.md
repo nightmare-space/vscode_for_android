@@ -49,3 +49,30 @@ TODO: Like Sula, slide the sidebar to directly input pasted text.
 ## Git History
 
 [![Star History Chart](https://api.star-history.com/svg?repos=nightmare-space/vscode_for_android&type=Date)](https://star-history.com/#nightmare-space/vscode_for_android&Date)
+
+
+
+## 注意
+
+Code Server 是在一个 Ubuntu 中运行的，并非 termux 环境，所以，你需要装任何的依赖，只需要查询 Ubuntu 安装依赖的方式即可
+
+
+## TODO 移除 termux
+
+用busybox来代替
+
+
+
+## 安装内部依赖
+
+这一节本不该出现在这，因为它本就不是 Code FA 的问题，但是极多的人不会使用 Ubuntu 安装简单的依赖，所有的相关问题都抛给 Code FA
+
+
+## 备份您的 Code FA 数据以拷贝到其他设备或升级 Code FA
+
+
+改名叫 code_server_for_android
+
+
+
+## 捐赠
