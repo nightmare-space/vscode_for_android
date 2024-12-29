@@ -1,30 +1,9 @@
 
 plugins {
-    id "com.android.application"
-    id "kotlin-android"
-    id "dev.flutter.flutter-gradle-plugin"
+    id 'com.android.application'
+    id 'kotlin-android'
+    id 'dev.flutter.flutter-gradle-plugin'
 }
-
-def localProperties = new Properties()
-def localPropertiesFile = rootProject.file('local.properties')
-if (localPropertiesFile.exists()) {
-    localPropertiesFile.withReader('UTF-8') { reader ->
-        localProperties.load(reader)
-    }
-}
-
-
-def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
-if (flutterVersionCode == null) {
-    flutterVersionCode = '1'
-}
-
-def flutterVersionName = localProperties.getProperty('flutter.versionName')
-if (flutterVersionName == null) {
-    flutterVersionName = '1.0'
-}
-
-
 // 本地编译注释以下代码
 // start
 def keystorePropertiesFile = rootProject.file('key.properties')
@@ -32,20 +11,15 @@ def keystoreProperties = new Properties()
 keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
 // end
 android {
-    compileSdkVersion 34
-    // ndkVersion "21.1.6352462"
-    //     externalNativeBuild {
-    // //            ndkBuild {
-    // //                path 'jni/Android.mk'
-    // //            }
-    //         cmake {
-    //             version "3.22.1"
-    //         }
-    //     }
+    namespace 'com.nightmare.code'
+    compileSdk = flutter.compileSdkVersion
+    ndkVersion = flutter.ndkVersion
+
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility = 11
+        targetCompatibility = 11
     }
+
     signingConfigs {
         // 本地编译注释以下代码
         // start
@@ -55,41 +29,43 @@ android {
             storeFile file(keystoreProperties['storeFile'])
             storePassword keystoreProperties['storePassword']
         }
-        // end
+    // end
     }
+
     defaultConfig {
         applicationId 'com.nightmare.code'
-        minSdkVersion 24
-        targetSdkVersion 28
-        versionCode flutterVersionCode.toInteger()
-        versionName flutterVersionName
+        minSdk = 24
+        targetSdk = 35
+        versionCode = flutter.versionCode
+        versionName = flutter.versionName
     }
 
     lintOptions {
         disable 'InvalidPackage'
-        checkReleaseBuilds false
-        // Or, if you prefer, you can continue to check for errors in release builds,
-        // but continue the build even when errors are found:
-        abortOnError false
     }
+
     buildTypes {
         release {
+            signingConfig signingConfigs.release
+            minifyEnabled true
+            shrinkResources true
+        }
+        debug {
             signingConfig signingConfigs.release
             minifyEnabled false
             shrinkResources false
         }
-        debug {
-            signingConfig signingConfigs.release
-        }
     }
-    repositories {
-        flatDir {
-            dirs 'libs'
-        }
-    }
+
     project.android.applicationVariants.all { variant ->
         variant.outputs.each { output ->
-            output.versionCodeOverride = flutterVersionCode.toInteger()
+            output.versionCodeOverride = flutter.versionCode
+        }
+    }
+
+    sourceSets {
+        main {
+            jniLibs.srcDirs = ['src/main/jniLibs']
         }
     }
 }
@@ -100,5 +76,5 @@ flutter {
 dependencies {
     implementation 'androidx.constraintlayout:constraintlayout:2.1.4'
 
-    // implementation fileTree(include: ['*.jar', '*aar'], dir: 'libs')
+// implementation fileTree(include: ['*.jar', '*aar'], dir: 'libs')
 }
