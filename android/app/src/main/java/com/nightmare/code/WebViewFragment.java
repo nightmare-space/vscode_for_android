@@ -1,7 +1,5 @@
 package com.nightmare.code;
 
-import android.annotation.SuppressLint;
-import android.app.Activity;
 import android.content.ClipData;
 import android.content.ClipboardManager;
 import android.content.Context;
@@ -13,27 +11,30 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.provider.Settings;
-import android.view.Window;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 import android.webkit.JavascriptInterface;
 import android.webkit.WebChromeClient;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-public class VSCodePage extends Activity {
-    WebView mWebView;
-    Activity context;
-    OrientoinListener myOrientoinListener;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
+import androidx.fragment.app.Fragment;
 
-    @SuppressLint("SetJavaScriptEnabled")
+public class WebViewFragment extends Fragment {
+
+    OrientationListener myOrientoinListener;
+
+    @Nullable
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        requestWindowFeature(Window.FEATURE_NO_TITLE);
-        setContentView(R.layout.webview);
-        myOrientoinListener = new OrientoinListener(this);
+    public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+        WebView mWebView;
+        myOrientoinListener = new OrientationListener(getActivity());
         checkState();
-        getContentResolver().registerContentObserver(
+        getContext().getContentResolver().registerContentObserver(
                 Settings.System.getUriFor(Settings.System.ACCELEROMETER_ROTATION),
                 true,
                 new ContentObserver(new Handler()) {
@@ -43,9 +44,10 @@ public class VSCodePage extends Activity {
                     }
                 }
         );
-        //获得控件
-        context = this;
-        mWebView = (WebView) findViewById(R.id.wv_webview);
+        mWebView = new WebView(getContext());
+        // 设置 mWebView 为 MatchParent
+        ViewGroup.LayoutParams layoutParams = new ViewGroup.LayoutParams(ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.MATCH_PARENT);
+        mWebView.setLayoutParams(layoutParams);
         //访问网页
         WebSettings mWebSettings = mWebView.getSettings();
         //允许使用JS
@@ -61,7 +63,7 @@ public class VSCodePage extends Activity {
         mWebSettings.setDefaultTextEncodingName("utf-8");
         mWebSettings.setLoadsImagesAutomatically(true);
         mWebSettings.setSupportMultipleWindows(true);
-        mWebView.addJavascriptInterface(new JavaScriptBridge(this), "Android");
+        mWebView.addJavascriptInterface(new JavaScriptBridge(getContext()), "Android");
         mWebView.setWebChromeClient(webChromeClient);
         // feat 剪切板内容获取的hook
         mWebView.setWebViewClient(new WebViewClient() {
@@ -89,7 +91,9 @@ public class VSCodePage extends Activity {
             }
         });
         mWebView.loadUrl("http://127.0.0.1:20000");
+        return mWebView;
     }
+
 
     public static class JavaScriptBridge {
         Context mContext;
@@ -110,7 +114,7 @@ public class VSCodePage extends Activity {
     }
 
     void checkState() {
-        boolean autoRotateOn = (android.provider.Settings.System.getInt(getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1);
+        boolean autoRotateOn = (android.provider.Settings.System.getInt(getContext().getContentResolver(), Settings.System.ACCELEROMETER_ROTATION, 0) == 1);
         //检查系统是否开启自动旋转
         if (autoRotateOn) {
             myOrientoinListener.enable();
@@ -124,12 +128,12 @@ public class VSCodePage extends Activity {
         //=========多窗口的问题==========================================================
         @Override
         public boolean onCreateWindow(WebView view, boolean isDialog, boolean isUserGesture, Message resultMsg) {
-            WebView childView = new WebView(context);//Parent WebView cannot host it's own popup window.
+            WebView childView = new WebView(getContext());//Parent WebView cannot host it's own popup window.
             childView.setBackgroundColor(Color.GREEN);
             childView.setWebViewClient(new WebViewClient() {
                 @Override
                 public boolean shouldOverrideUrlLoading(WebView view, String url) {
-                    context.startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
+                    getContext().startActivity(new Intent(Intent.ACTION_VIEW, Uri.parse(url)));
                     return true;
                 }
             });
@@ -142,9 +146,8 @@ public class VSCodePage extends Activity {
     };
 
     @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        //销毁时取消监听
+    public void onStop() {
+        super.onStop();
         myOrientoinListener.disable();
     }
 
