@@ -24,64 +24,73 @@ class _TerminalPageState extends State<TerminalPage> {
         return const SizedBox();
       }
       return Scaffold(
-        backgroundColor: Colors.black,
+        backgroundColor: Theme.of(context).colorScheme.surface,
         body: PopScope(
           onPopInvoked: (didpop) {
             controller.pseudoTerminal!.writeString('\x03');
           },
           canPop: true,
           child: Stack(
+            alignment: Alignment.center,
             children: [
-              if (controller.pseudoTerminal != null)
-                SafeArea(
-                  child: XTermWrapper(
-                    terminal: controller.terminal,
-                    pseudoTerminal: controller.pseudoTerminal,
-                  ),
-                ),
-              if (controller.webviewHasOpen)
-                Center(
-                  child: Material(
-                    color: const Color(0xfff3f4f9),
-                    borderRadius: BorderRadius.circular(12.w),
-                    clipBehavior: Clip.antiAlias,
-                    child: InkWell(
-                      onTap: () {
-                        PluginUtil.openWebView();
-                      },
-                      child: SizedBox(
-                        height: 48.w,
-                        child: Padding(
-                          padding: EdgeInsets.symmetric(horizontal: 16.w),
-                          child: Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            mainAxisSize: MainAxisSize.min,
+              XTermWrapper(
+                terminal: controller.terminal,
+                pseudoTerminal: controller.pseudoTerminal,
+              ),
+              Center(
+                child: Material(
+                  borderRadius: BorderRadius.circular(12.w),
+                  color: Theme.of(context).colorScheme.surfaceContainer,
+                  child: SizedBox(
+                    width: 300.w,
+                    height: 60.w,
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Center(
+                          child: LoadingProgress(
+                            minRadius: 6,
+                            strokeWidth: 3,
+                            increaseRadius: 3,
+                          ),
+                        ),
+                        SizedBox(height: 4.w),
+                        Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 10.w),
+                          child: Stack(
                             children: [
-                              if (controller.vsCodeStaring)
-                                SpinKitDualRing(
-                                  color: Theme.of(context).primaryColor,
-                                  size: 18.w,
-                                  lineWidth: 2.w,
+                              Container(
+                                height: 4.w,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary.withOpacity(0.2),
+                                  borderRadius: BorderRadius.circular(5.w),
                                 ),
-                              if (controller.vsCodeStaring)
-                                const SizedBox(
-                                  width: 8,
-                                ),
-                              Text(
-                                controller.vsCodeStaring ? 'VS Code 启动中...' : '回到VS Code窗口',
-                                style: TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.black,
-                                  fontSize: 16.w,
+                              ),
+                              AnimatedContainer(
+                                duration: 300.milliseconds,
+                                height: 4.w,
+                                width: 300.w * controller.progress,
+                                decoration: BoxDecoration(
+                                  color: Theme.of(context).colorScheme.primary,
+                                  borderRadius: BorderRadius.circular(5.w),
                                 ),
                               ),
                             ],
                           ),
                         ),
-                      ),
+                        // Text(
+                        //   controller.lastLine,
+                        //   style: TextStyle(
+                        //     color: Colors.black,
+                        //     fontSize: 12.w,
+                        //   ),
+                        // ),
+                      ],
                     ),
                   ),
                 ),
+              ),
             ],
           ),
         ),

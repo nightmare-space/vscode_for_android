@@ -4,6 +4,15 @@ import 'dart:typed_data';
 
 import 'package:flutter_pty/flutter_pty.dart';
 import 'package:global_repository/global_repository.dart';
+import 'package:xterm/xterm.dart';
+
+extension TerminalExt on Terminal {
+  //
+  // echo -e "\\033[31m\$@\\033[0m"
+  void writeProgress(String data) {
+    write('\x1b[31m- $data\x1b[0m\n\r');
+  }
+}
 
 extension PTYExt on Pty {
   void writeString(String data) {

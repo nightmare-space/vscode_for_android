@@ -13,9 +13,8 @@ Pty createPTY({
   envir['TERMUX_PREFIX'] = RuntimeEnvir.usrPath;
   envir['TERM'] = 'xterm-256color';
   envir['PATH'] = RuntimeEnvir.path;
-  if (File('${RuntimeEnvir.usrPath}/lib/libtermux-exec.so').existsSync()) {
-    envir['LD_PRELOAD'] = '${RuntimeEnvir.usrPath}/lib/libtermux-exec.so';
-  }
+  envir['PROOT_LOADER'] = '${RuntimeEnvir.binPath}/loader';
+  envir['LD_LIBRARY_PATH'] = RuntimeEnvir.binPath;
   return Pty.start(
     '/system/bin/sh',
     arguments: [],

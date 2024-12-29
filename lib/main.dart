@@ -1,3 +1,4 @@
+// import 'package:behavior_api/behavior_api.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
@@ -5,7 +6,6 @@ import 'package:global_repository/global_repository.dart';
 import 'package:settings/settings.dart';
 import 'package:vscode_for_android/terminal_page.dart';
 //FIXME: import 'behavior.dart';
-
 
 Future<void> main() async {
   RuntimeEnvir.initEnvirWithPackageName('com.nightmare.code');
@@ -29,12 +29,9 @@ class MyApp extends StatelessWidget {
     return GetMaterialApp(
       title: 'Code FA',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
+        colorSchemeSeed: Colors.primaries[3],
       ),
-      home: const Scaffold(
-        backgroundColor: Colors.transparent,
-        body: TerminalPage(),
-      ),
+      home: TerminalPage(),
     );
   }
 }

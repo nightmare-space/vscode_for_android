@@ -4,139 +4,159 @@ import 'package:global_repository/global_repository.dart';
 import 'config.dart';
 
 String version = '';
-// prootDistro 路径
+// proot distro 路径
 String prootDistroPath = '${RuntimeEnvir.usrPath}/var/lib/proot-distro';
 // ubuntu 路径
 String ubuntuPath = '$prootDistroPath/installed-rootfs/ubuntu';
-String lockFile = '${RuntimeEnvir.dataPath}/cache/init_lock';
-// 清华源
-String source = '''
-# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy main restricted universe multiverse
-# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy main restricted universe multiverse
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-updates main restricted universe multiverse
-# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-updates main restricted universe multiverse
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
-# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
-# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
- 
-# 预发布软件源，不建议启用
-# deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
-# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
-''';
 
-String colorEcho = '''
-colorEcho(){
+String function = '''
+export UBUNTU_PATH=$ubuntuPath
+export CSPORT=${Config.port}
+export CSVERSION=${Config.defaultCodeServerVersion}
+export TMPDIR=${RuntimeEnvir.tmpPath}
+export BIN=${RuntimeEnvir.binPath}
+
+progress_echo(){
   echo -e "\\033[31m\$@\\033[0m"
 }
 ''';
 
 /// 安装ubuntu的shell
-/// todo 内置proot，然后用dpkg安装
-String installUbuntu = '''
-install_ubuntu(){
-  cd ~
-  colorEcho - 安装Ubuntu Linux
-  cd ~/proot-distro-master
-  bash ./install.sh
-  apt-get install -y proot >/dev/null
-  old=`cat $ubuntuPath/etc/issue 2>/dev/null`
-  #echo \$old
-  strB="21.04"
-  result=\$(echo \$old | grep "\${strB}")
-  if [ "\$result" != "" ]; then
-    echo "升级ubuntu中"
-    mv -f $ubuntuPath/home ./
-    rm -rf $ubuntuPath
-  fi
-  proot-distro install ubuntu >/dev/null 2>&1
-  mv -f ./home $ubuntuPath/ >/dev/null 2>&1
-  echo '$source' > $ubuntuPath/etc/apt/sources.list
-  echo 'export PATH=/opt/code-server-$version-linux-arm64/bin:\$PATH' >> $ubuntuPath/root/.bashrc
-  echo 'export ANDROID_DATA=/home/' >> $ubuntuPath/root/.bashrc
-}
-''';
+String functions = r'''
+change_ubuntu_source(){
+  cat <<EOF > $UBUNTU_PATH/etc/apt/sources.list
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
+deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
 
-/// 安装code-server的脚本
-String installVsCodeScript = '''
-$colorEcho
-install_vs_code(){
-  if [ ! -d "$ubuntuPath/home/code-server-$version-linux-arm64" ];then
+# 预发布软件源，不建议启用
+# deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+EOF
+}
+gen_code_server_config(){
+  mkdir -p $UBUNTU_PATH/root/.config/code-server 2>/dev/null
+  echo "
+  bind-addr: 0.0.0.0:$CSPORT
+  auth: none
+  password: none
+  cert: false
+  " > $UBUNTU_PATH/root/.config/code-server/config.yaml
+}
+
+remove_old_ubuntu(){
+  progress_echo "- 移除旧版Ubuntu"
+}
+
+install_proot_distro(){
+  proot_distro_path=`which proot-distro`
+  if [ -z "$proot_distro_path" ]; then
+    progress_echo "- proot-distro 未安装, 安装中..."
+    cd ~
+    busybox unzip proot-distro.zip -d proot-distro
+    cd ~/proot-distro
+    bash ./install.sh
+  else
+    progress_echo "- proot-distro 已安装"
+  fi
+}
+
+install_ubuntu(){
+  mkdir -p $UBUNTU_PATH 2>/dev/null
+  if [ -z "$(ls -A $UBUNTU_PATH)" ]; then
+    progress_echo "- Ubuntu 未安装, 安装中..."
+    busybox tar xvf ~/ubuntu-noble-aarch64-pd-v4.11.0.tar.xz -C $UBUNTU_PATH/ | while read line; do
+      # echo -ne "\033[2K\0337\r$line\0338"
+      echo $line
+    done
+    mv $UBUNTU_PATH/ubuntu-noble-aarch64/* $UBUNTU_PATH/
+    rm -rf $UBUNTU_PATH/ubuntu-noble-aarch64
+  else
+    VERSION=`cat $UBUNTU_PATH/etc/issue.net 2>/dev/null`
+    # VERSION=`cat $UBUNTU_PATH/etc/issue 2>/dev/null | sed 's/\\n//g' | sed 's/\\l//g'`
+    progress_echo "- Ubuntu 已安装 -> $VERSION"
+  fi
+  change_ubuntu_source
+  # TODO 下面代码不能被反复执行
+  echo 'export PATH=/opt/code-server-$version-linux-arm64/bin:\$PATH' >> $UBUNTU_PATH/root/.bashrc
+  echo 'export ANDROID_DATA=/home/' >> $UBUNTU_PATH/root/.bashrc
+}
+
+
+install_vs_code_old(){
+  if [ ! -d "$UBUNTU_PATH/home/code-server-$CSVERSION-linux-arm64" ];then
     cd $ubuntuPath/home
-    server_path="/sdcard/code-server-$version-linux-arm64.tar.gz"
+    server_path="/sdcard/code-server-$CSVERSION-linux-arm64.tar.gz"
     if [ ! -f "\$server_path" ];then
-      echo "没有发现外置包，请到http://nightmare.press:5244/AliYun下载外置包"
+      echo "没有发现外置包,请下载外置包"
     else
-      colorEcho - 解压 Vs Code Arm64
-      tar zxvfh \$server_path > /dev/null
+      progress_echo - 解压 Vs Code Arm64
+      tar zxfh \$server_path > /dev/null
       cd code-server-$version-linux-arm64
     fi
   fi
 }
+
+fix_code_server_hard_link(){
+  cd $UBUNTU_PATH/opt/code-server-$CSVERSION-linux-arm64/
+  ls node_modules/argon2/build-tmp-napi-v3/Release
+  cp node_modules/argon2/build-tmp-napi-v3/Release/argon2.node node_modules/argon2/build-tmp-napi-v3/Release/obj.target/argon2.node
+  cp node_modules/argon2/build-tmp-napi-v3/Release/argon2.a node_modules/argon2/build-tmp-napi-v3/Release/obj.target/argon2.a
+  cp node_modules/argon2/build-tmp-napi-v3/Release/argon2.node node_modules/argon2/lib/binding/napi-v3/argon2.node
+  cp lib/vscode/node_modules/@parcel/watcher/build/Release/obj.target/watcher.node lib/vscode/node_modules/@parcel/watcher/build/Release/watcher.node
+  cp lib/vscode/node_modules/@parcel/watcher/build/Release/nothing.a lib/vscode/node_modules/@parcel/watcher/build/node-addon-api/nothing.a
+  cp lib/vscode/node_modules/kerberos/build/Release/kerberos.node lib/vscode/node_modules/kerberos/build/Release/obj.target/kerberos.node
+  cp lib/vscode/node_modules/native-watchdog/build/Release/watchdog.node lib/vscode/node_modules/native-watchdog/build/Release/obj.target/watchdog.node
+  cp lib/vscode/node_modules/@vscode/windows-registry/build/Release/obj.target/winregistry.node lib/vscode/node_modules/@vscode/windows-registry/build/Release/winregistry.node
+  cp lib/vscode/node_modules/@vscode/windows-process-tree/build/Release/windows_process_tree.node lib/vscode/node_modules/@vscode/windows-process-tree/build/Release/obj.target/windows_process_tree.node
+  cp lib/vscode/node_modules/@vscode/spdlog/build/Release/spdlog.node lib/vscode/node_modules/@vscode/spdlog/build/Release/obj.target/spdlog.node
+  cp lib/vscode/node_modules/@vscode/deviceid/build/Release/windows.node lib/vscode/node_modules/@vscode/deviceid/build/Release/obj.target/windows.node
+}
+
+install_vs_code(){
+  if [ ! -d "$UBUNTU_PATH/opt/code-server-$CSVERSION-linux-arm64" ];then
+    tar zxfh $TMPDIR/code-server-$CSVERSION-linux-arm64.tar.gz -C $UBUNTU_PATH/opt | while read line; do
+      # echo -ne "\033[2K\0337\r$line\0338"
+      echo $line
+    done
+    progress_echo "pwd: `pwd`"
+    fix_code_server_hard_link
+    progress_echo "pwd: `pwd`"
+  fi
+}
+
+login_ubuntu(){
+  bash $BIN/proot-distro login --bind /storage/emulated/0:/storage/emulated/0/ ubuntu  -- /opt/code-server-$CSVERSION-linux-arm64/bin/code-server
+}
+
 ''';
 
-/// TODO 加上端口的kill
 /// 启动 vs code 的shell
 String startVsCodeScript = '''
-$installUbuntu
-$installVsCodeScript
+$function
+$functions
+
+clear_lines(){
+  printf "\\033[1A" # Move cursor up one line
+  printf "\\033[K"  # Clear the line
+  printf "\\033[1A" # Move cursor up one line
+  printf "\\033[K"  # Clear the line
+}
 start_vs_code(){
+  clear_lines
+  install_proot_distro
+  sleep 1
+  echo 7 > \$TMPDIR/progress
   install_ubuntu
-  #install_vs_code
-  mkdir -p $ubuntuPath/root/.config/code-server 2>/dev/null
-  echo '$source' > $ubuntuPath/etc/apt/sources.list
-  echo '
-  bind-addr: 0.0.0.0:${Config.port}
-  auth: none
-  password: none
-  cert: false
-  ' > $ubuntuPath/root/.config/code-server/config.yaml
-  # 可能切换了版本，对应的code server被解压到app的home了
-  CODE_PATH=$ubuntuPath/opt/code-server-$version-linux-arm64
-  mv ${RuntimeEnvir.homePath}/code-server-$version-linux-arm64 $ubuntuPath/opt/ 2>/dev/null
-  chmod +x \$CODE_PATH/bin/code-server
-  chmod +x \$CODE_PATH/lib/node
-  chmod +x \$CODE_PATH/lib/vscode/node_modules/@vscode/ripgrep/bin/rg
-  echo -e "\\033[31m- 启动中..\\033[0m"
-  proot-distro  login --bind /sdcard:/sd --bind /storage/emulated/0:/storage/emulated/0/ ubuntu  -- /opt/code-server-$version-linux-arm64/bin/code-server
-}
-''';
-
-String getRedLog(String data) {
-  return '\x1b[31m$data\x1b[0m';
-}
-
-/// 初始化类Linux环境的shell
-String initShell = '''
-$installUbuntu
-$startVsCodeScript
-function initApp(){
-  cd ${RuntimeEnvir.usrPath}/
-  colorEcho - 准备符号链接...
-  for line in `cat SYMLINKS.txt`
-  do
-    OLD_IFS="\$IFS"
-    IFS="←"
-    arr=(\$line)
-    IFS="\$OLD_IFS"
-    filename=\$(basename "\${arr[0]}")
-    echo -n -e "\x1b[2K\r- \$filename"
-    ln -s \${arr[0]} \${arr[3]}
-  done
-  echo
-  rm -rf SYMLINKS.txt
-  TMPDIR=${RuntimeEnvir.tmpPath}
-  filename=bootstrap
-  rm -rf "\$TMPDIR/\$filename*"
-  rm -rf "\$TMPDIR/*"
-  chmod -R 0777 ${RuntimeEnvir.binPath}/*
-  chmod -R 0777 ${RuntimeEnvir.usrPath}/lib/* 2>/dev/null
-  chmod -R 0777 ${RuntimeEnvir.usrPath}/libexec/* 2>/dev/null
-  rm -rf $lockFile
-  export LD_PRELOAD=${RuntimeEnvir.usrPath}/lib/libtermux-exec.so
-  install_ubuntu
-  start_vs_code
-  bash
+  sleep 1
+  echo 8 > \$TMPDIR/progress
+  install_vs_code
+  sleep 1
+  echo 9 > \$TMPDIR/progress
+  gen_code_server_config
+  sleep 1
+  echo 10 > \$TMPDIR/progress
+  login_ubuntu
 }
 ''';
