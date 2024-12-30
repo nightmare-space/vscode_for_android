@@ -1,4 +1,5 @@
 ## 1.5.0
+
 很抱歉，所有还在用 Code FA 的用户，这个项目的维护并不积极，Code LFA 免费且开源，所有的投入都是我无偿奉献出我的时间，而且我很难从这一切中找到平衡，后续也会面临经济上的一些问题
 
 简单了解过我的朋友可能知道，我手上的项目非常的多，也非常的忙
@@ -11,11 +12,14 @@ Code LFA(Code Launcher For Android)
 
 我并未使用任何 code-server 的代码，code-server 也是以压缩包的方式存在 Code LFA 中，更何况 Code LFA 本身也是开源的
 
-同时更新了 Readme，部分朋友总是觉得安装依赖是 Code FA 的问题，所以我加了一些说明
+后续会更新 Readme，部分朋友总是觉得安装依赖是 Code FA 的问题，所以我准备加了一些简单的说明
 
 其实绝大部分的问题，都是大家完全不会使用 Ubuntu 导致的，也不会使用 apt
 
-### 更新日志
+不要把在 Windows 上使用 VS Code 的习惯带到 Code LFA 上，不要问怎么安装这怎么安装那，遇到问题，请问 GPT : 如何在 Ubuntu 的 VS Code 的 Terminal 中上安装 xxx
+
+### 主要更新
+
 **1.移除 termux 环境**
 
 在以往的版本中，Code LFA 其实包含了一个完整的 termux 环境，简单说是，里面内置了一个和 termux 一模一样的类 Linux 环境，而这都是需要修改包名，重新编译 termux-package 的 bootstrap，这个过程非常复杂，而我精力分散后，这部分几乎无法维护，并且会增加 26M 的 apk 体积
@@ -23,8 +27,8 @@ Code LFA(Code Launcher For Android)
 这部分去除后，原有的包体积增加只需要 1.6M
 
 相关依赖来源
-- bash: proot-distro 语法依赖
-- busybox: proot-distro 需要依赖很多安卓本身没有的命令
+- bash: [bash-in-magisk](https://github.com/i-Taylo/bash-in-magisk), proot-distro 语法依赖
+- busybox: [busybox-ndk](https://github.com/Magisk-Modules-Repo/busybox-ndk)，proot-distro 需要依赖很多安卓本身没有的命令
 - proot、libtalloc、loader: 这个仍然需要自编译 termux-package，但是好在动态链接很少，不需要经常更新
 
 我也思考过，移除 bash 和 proot-distro，但其实 proot-distro 帮我们处理了很多事情，如果最后仅精简成一行 proot 命令的话，可能启动的 ubuntu 会有一些问题
@@ -36,6 +40,8 @@ Code LFA(Code Launcher For Android)
 **3.升级默认 code-server 到 4.96.2**
 
 目前有开发者为 Code LFA 提交了一个 PR 以实现工作流产出 Apk，但我当前没有精力测试
+
+**启动界面点击屏幕即可展示/隐藏终端**
 
 **4.优化启动界面 UI**
 
@@ -71,8 +77,9 @@ hrwxr-xr-x  0 root   root        0 Dec 21 05:39 code-server-4.96.2-linux-arm64/l
 
 ### 其他更新
 - 多 Activty 切换成 Fragment，这个还没确定会保留，目前是为了兼容 AR 眼镜
-- 升级 Ubuntu 到 24.04
-- 代码精简，优化
+- 升级 Ubuntu 到 22.04，版本号没变，但资源更新了一下
+- 代码精简，优化，移除无用依赖
+- 删除了一些 Git 历史文件，所以同步仓库源的朋友需要重新 clone 一下
 
 
 ##  TODO 中英文
