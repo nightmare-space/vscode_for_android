@@ -27,10 +27,8 @@ public class MainActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         mContext = this;
         setContentView(R.layout.my_activity_layout);
-        // Attempt to find an existing FlutterFragment,
-        // in case this is not the first time that onCreate() was run.
         flutterFragment = (FlutterFragment) fragmentManager.findFragmentByTag(TAG_FLUTTER_FRAGMENT);
-        FlutterEngine flutterEngine = new FlutterEngine(this);
+        FlutterEngine flutterEngine = new FlutterEngine(this, null, false);
         flutterEngine.getDartExecutor().executeDartEntrypoint(DartExecutor.DartEntrypoint.createDefault());
         new MethodChannel(flutterEngine.getDartExecutor().getBinaryMessenger(), "vscode_channel").setMethodCallHandler((call, result) -> {
             switch (call.method) {

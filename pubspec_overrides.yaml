@@ -1,0 +1,7 @@
+dependency_overrides:
+  behavior_api:
+    path: /Users/nightmare/Desktop/nightmare-core/behavior_api
+  permission_handler: 11.3.1
+  device_info_plus: ^10.1.2
+  global_repository:
+    path: /Users/nightmare/Desktop/nightmare-space/global_repository
