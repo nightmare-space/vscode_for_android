@@ -11,6 +11,7 @@ String ubuntuPath = '$prootDistroPath/installed-rootfs/ubuntu';
 
 String function = '''
 export UBUNTU_PATH=$ubuntuPath
+export UBUNTU=${Config.ubuntu}
 export CSPORT=${Config.port}
 export CSVERSION=${Config.defaultCodeServerVersion}
 export TMPDIR=${RuntimeEnvir.tmpPath}
@@ -25,14 +26,58 @@ progress_echo(){
 String functions = r'''
 change_ubuntu_source(){
   cat <<EOF > $UBUNTU_PATH/etc/apt/sources.list
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
-# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-backports main restricted universe multiverse
-deb [trusted=yes] http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-security main restricted universe multiverse
-# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-security main restricted universe multiverse
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble-updates main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble-updates main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble-backports main restricted universe multiverse
+# deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble-backports main restricted universe multiverse
+
+# 以下安全更新软件源包含了官方源与镜像站配置，如有需要可自行修改注释切换
+# deb http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse
+# deb-src http://ports.ubuntu.com/ubuntu-ports/ noble-security main restricted universe multiverse
 
 # 预发布软件源，不建议启用
-# deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
-# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu/ jammy-proposed main restricted universe multiverse
+# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble-proposed main restricted universe multiverse
+# # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ noble-proposed main restricted universe multiverse
+EOF
+}
+change_jammy(){
+  cat <<EOF > $UBUNTU_PATH/etc/apt/sources.list
+# 默认注释了源码镜像以提高 apt update 速度，如有需要可自行取消注释
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-updates main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-updates main restricted universe multiverse
+deb http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
+# deb-src http://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-backports main restricted universe multiverse
+
+# 以下安全更新软件源包含了官方源与镜像站配置，如有需要可自行修改注释切换
+# deb http://ports.ubuntu.com/ubuntu-ports/ jammy-security main restricted universe multiverse
+# deb-src http://ports.ubuntu.com/ubuntu-ports/ jammy-security main restricted universe multiverse
+
+# 预发布软件源，不建议启用
+# deb https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-proposed main restricted universe multiverse
+# # deb-src https://mirrors.tuna.tsinghua.edu.cn/ubuntu-ports/ jammy-proposed main restricted universe multiverse
+EOF
+}
+change_ubuntu_source_ali(){
+  cat <<EOF > $UBUNTU_PATH/etc/apt/sources.list
+deb https://mirrors.aliyun.com/ubuntu/ noble main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ noble main restricted universe multiverse
+ 
+deb https://mirrors.aliyun.com/ubuntu/ noble-security main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ noble-security main restricted universe multiverse
+ 
+deb https://mirrors.aliyun.com/ubuntu/ noble-updates main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ noble-updates main restricted universe multiverse
+ 
+# deb https://mirrors.aliyun.com/ubuntu/ noble-proposed main restricted universe multiverse
+# deb-src https://mirrors.aliyun.com/ubuntu/ noble-proposed main restricted universe multiverse
+ 
+deb https://mirrors.aliyun.com/ubuntu/ noble-backports main restricted universe multiverse
+deb-src https://mirrors.aliyun.com/ubuntu/ noble-backports main restricted universe multiverse
 EOF
 }
 gen_code_server_config(){
@@ -66,21 +111,24 @@ install_ubuntu(){
   mkdir -p $UBUNTU_PATH 2>/dev/null
   if [ -z "$(ls -A $UBUNTU_PATH)" ]; then
     progress_echo "- Ubuntu 未安装, 安装中..."
-    busybox tar xvf ~/ubuntu-noble-aarch64-pd-v4.11.0.tar.xz -C $UBUNTU_PATH/ | while read line; do
+    busybox tar xvf ~/$UBUNTU -C $UBUNTU_PATH/ | while read line; do
       # echo -ne "\033[2K\0337\r$line\0338"
       echo $line
     done
-    mv $UBUNTU_PATH/ubuntu-noble-aarch64/* $UBUNTU_PATH/
-    rm -rf $UBUNTU_PATH/ubuntu-noble-aarch64
+    UBUNTU_NAME='ubuntu-jammy-aarch64'
+    mv $UBUNTU_PATH/$UBUNTU_NAME/* $UBUNTU_PATH/
+    rm -rf $UBUNTU_PATH/$UBUNTU_NAME
+    echo 'export PATH=/opt/code-server-$CSVERSION-linux-arm64/bin:$PATH' >> $UBUNTU_PATH/root/.bashrc
+    echo 'export ANDROID_DATA=/home/' >> $UBUNTU_PATH/root/.bashrc
   else
     VERSION=`cat $UBUNTU_PATH/etc/issue.net 2>/dev/null`
     # VERSION=`cat $UBUNTU_PATH/etc/issue 2>/dev/null | sed 's/\\n//g' | sed 's/\\l//g'`
     progress_echo "- Ubuntu 已安装 -> $VERSION"
   fi
-  change_ubuntu_source
+  change_jammy
+  echo 'nameserver 8.8.8.8' > $UBUNTU_PATH/etc/resolv.conf
   # TODO 下面代码不能被反复执行
-  echo 'export PATH=/opt/code-server-$version-linux-arm64/bin:\$PATH' >> $UBUNTU_PATH/root/.bashrc
-  echo 'export ANDROID_DATA=/home/' >> $UBUNTU_PATH/root/.bashrc
+  
 }
 
 
@@ -120,9 +168,9 @@ install_vs_code(){
       # echo -ne "\033[2K\0337\r$line\0338"
       echo $line
     done
-    progress_echo "pwd: `pwd`"
+    # progress_echo "pwd: `pwd`"
     fix_code_server_hard_link
-    progress_echo "pwd: `pwd`"
+    # progress_echo "pwd: `pwd`"
   fi
 }
 
@@ -143,20 +191,23 @@ clear_lines(){
   printf "\\033[1A" # Move cursor up one line
   printf "\\033[K"  # Clear the line
 }
+update_progress(){
+  printf \$1 > \$TMPDIR/progress
+}
 start_vs_code(){
   clear_lines
   install_proot_distro
   sleep 1
-  echo 7 > \$TMPDIR/progress
+  update_progress 7
   install_ubuntu
   sleep 1
-  echo 8 > \$TMPDIR/progress
+  update_progress 8
   install_vs_code
   sleep 1
-  echo 9 > \$TMPDIR/progress
+  update_progress 9
   gen_code_server_config
   sleep 1
-  echo 10 > \$TMPDIR/progress
+  update_progress 10
   login_ubuntu
 }
 ''';

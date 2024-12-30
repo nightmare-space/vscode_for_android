@@ -1,10 +1,12 @@
 // import 'package:behavior_api/behavior_api.dart';
+import 'package:behavior_api/behavior_api.dart';
+import 'package:code_lfa/config.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
 import 'package:settings/settings.dart';
-import 'package:vscode_for_android/terminal_page.dart';
+import 'package:code_lfa/terminal_page.dart';
 //FIXME: import 'behavior.dart';
 
 Future<void> main() async {
@@ -17,7 +19,7 @@ Future<void> main() async {
     systemNavigationBarColor: Colors.transparent,
     systemNavigationBarDividerColor: Colors.transparent,
   ));
-  //FIXME: initApi('Code FA', Config.versionName);
+  initApi('Code FA', Config.versionName);
 }
 
 class MyApp extends StatelessWidget {

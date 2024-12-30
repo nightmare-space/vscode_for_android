@@ -1,49 +1,5 @@
-import 'dart:async';
-
 import 'package:flutter/material.dart';
-import 'package:flutter_pty/flutter_pty.dart';
-import 'package:get/utils.dart';
-import 'package:vscode_for_android/utils/extension.dart';
 import 'package:xterm/xterm.dart';
-
-class XTermWrapper extends StatefulWidget {
-  const XTermWrapper({
-    super.key,
-    required this.terminal,
-    required this.pseudoTerminal,
-  });
-  final Terminal? terminal;
-  final Pty? pseudoTerminal;
-
-  @override
-  State<XTermWrapper> createState() => _XTermWrapperState();
-}
-
-class _XTermWrapperState extends State<XTermWrapper> {
-  StreamSubscription? streamSubscription;
-
-  @override
-  void initState() {
-    super.initState();
-    widget.terminal!.onOutput = (data) {
-      widget.pseudoTerminal!.writeString(data);
-    };
-
-    widget.terminal!.onResize = (width, height, pixelWidth, pixelHeight) {
-      widget.pseudoTerminal!.resize(height, width);
-    };
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return TerminalView(
-      widget.terminal!,
-      readOnly: false,
-      backgroundOpacity: 0,
-      theme: macTheme,
-    );
-  }
-}
 
 TerminalTheme android = TerminalTheme(
   cursor: Color(0XAAAEAFAD),
@@ -70,6 +26,7 @@ TerminalTheme android = TerminalTheme(
   searchHitBackgroundCurrent: Color(0XFF31FF26),
   searchHitForeground: Color(0XFF000000),
 );
+
 const TerminalTheme macTheme = TerminalTheme(
   cursor: Color(0xFFAEAFAD),
   selection: Color(0xFFFFFF40),

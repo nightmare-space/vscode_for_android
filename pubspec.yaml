@@ -1,8 +1,8 @@
-name: vscode_for_android
+name: code_lfa
 description: VS Code for Android
 publish_to: "none" # Remove this line if you wish to publish to pub.dev
-version: 1.4.95+3
-code_server: 4.95.3
+version: 1.5.0+20
+code_server: 4.96.2
 environment:
   sdk: ">=3.3.0 <4.0.0"
 
@@ -10,7 +10,6 @@ dependencies:
   flutter:
     sdk: flutter
   signale: ^0.0.9
-  flutter_spinkit: ^5.2.0
   intl: ^0.19.0
   url_launcher: ^6.1.10
   archive: ^4.0.2

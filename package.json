@@ -1,6 +1,6 @@
 {
   "scripts": {
-    "Android: Run Release": "ni release -r",
+    "Android: Run Release": "nic release -r",
     "Android: Build Apk(Split Api)": "ni release -s",
     "Android: Build AAB": "ni release -a",
     "Mac: Install From Local Code": "ni release -m",

@@ -6,27 +6,37 @@ import 'package:flutter_pty/flutter_pty.dart';
 import 'package:get/get.dart';
 import 'package:global_repository/global_repository.dart';
 import 'package:settings/settings.dart';
-import 'package:vscode_for_android/utils/extension.dart';
 import 'package:xterm/xterm.dart';
 import 'config.dart';
 import 'script.dart';
 import 'utils/plugin_util.dart';
 import 'utils/pty_util.dart';
-import 'package:path/path.dart' as path;
 
-// TODO 进度条的展示用文件锁的方式
-// 点击背景即可展示终端内容
-// shell 中删除文件锁
+// TODO: 点击背景即可展示终端内容
+// 默认只加载进度条
 class HomeController extends GetxController {
   Pty? pseudoTerminal;
   bool vsCodeStaring = false;
-  Terminal terminal = Terminal(maxLines: 10000);
+  late Terminal terminal = Terminal(
+    maxLines: 10000,
+    onResize: (width, height, pixelWidth, pixelHeight) {
+      pseudoTerminal!.resize(height, width);
+    },
+    onOutput: (data) {
+      pseudoTerminal!.writeString(data);
+    },
+  );
   bool webviewHasOpen = false;
 
   double progress = 0.0;
   double step = 11;
   String lastLine = '';
   File file = File('${RuntimeEnvir.tmpPath}/progress');
+
+  void updateProgress(int value) {
+    file.writeAsString('$value');
+    update();
+  }
 
   /// 监听输出，当输出中包含vscode启动成功的标志时，启动vscode
   Future<void> vsCodeStartWhenSuccessBind() async {
@@ -69,7 +79,7 @@ class HomeController extends GetxController {
     await Future.delayed(const Duration(milliseconds: 100));
     webviewHasOpen = true;
     // 用url_launcher打开浏览器
-    file.writeAsStringSync('12');
+    updateProgress(11);
     update();
     PluginUtil.openWebView();
     Future.delayed(const Duration(milliseconds: 2000), () {
@@ -125,16 +135,20 @@ class HomeController extends GetxController {
 
   void syncProgress() {
     file.createSync(recursive: true);
-    file.writeAsStringSync('0');
-    file.watch(events: FileSystemEvent.all).listen((event) {
+    file.watch(events: FileSystemEvent.all).listen((event) async {
       if (event.type == FileSystemEvent.modify) {
-        String content = file.readAsStringSync();
+        String content = await file.readAsString();
+        Log.e('content -> $content');
+        if (content.isEmpty) {
+          return;
+        }
         progress = int.parse(content) / step;
         Log.e('progress -> $progress');
         update();
         // terminal.writeProgress(content);
       }
     });
+    updateProgress(0);
   }
 
   void createBusyboxLink() {
@@ -209,12 +223,12 @@ class HomeController extends GetxController {
     }
     terminal.writeProgress('创建PTY终端实例...');
     pseudoTerminal = createPTY();
-    file.writeAsStringSync('1');
+    updateProgress(1);
     terminal.writeProgress('定义需要使用的函数...');
     // Uint8List bytesFunctions = utf8.encode(startVsCodeScript);
     // pseudoTerminal!.write(bytesFunctions);
     await pseudoTerminal!.defineFunction(startVsCodeScript);
-    file.writeAsStringSync('2');
+    updateProgress(2);
     terminal.writeProgress('当前VS Code Server版本:$version...');
     // Directory('$prootDistroPath/dlcache').createSync(recursive: true);
 
@@ -224,32 +238,23 @@ class HomeController extends GetxController {
       'assets/proot-distro.zip',
       '${RuntimeEnvir.homePath}/proot-distro.zip',
     );
-
-    file.writeAsStringSync('3');
+    updateProgress(3);
     terminal.writeProgress('拷贝 ubuntu 到数据目录...');
     await AssetsUtils.copyAssetToPath(
-      'assets/ubuntu-noble-aarch64-pd-v4.11.0.tar.xz',
-      '${RuntimeEnvir.homePath}/ubuntu-noble-aarch64-pd-v4.11.0.tar.xz',
+      'assets/${Config.ubuntu}',
+      '${RuntimeEnvir.homePath}/${Config.ubuntu}',
     );
-    file.writeAsStringSync('4');
+    updateProgress(4);
     terminal.writeProgress('创建 Busybox 符号链接...');
     createBusyboxLink();
-    file.writeAsStringSync('5');
-
-    /// 定义需要使用的函数
-    // Uint8List bytesStartVsCodeScript = utf8.encode(startVsCodeScript);
-    // pseudoTerminal!.write(bytesStartVsCodeScript);
-    update();
+    updateProgress(5);
     vsCodeStartWhenSuccessBind();
-
     terminal.writeProgress('拷贝 code-server 到数据目录...');
     await AssetsUtils.copyAssetToPath(
       'assets/code-server-${Config.defaultCodeServerVersion}-linux-arm64.tar.gz',
       '${RuntimeEnvir.tmpPath}/code-server-${Config.defaultCodeServerVersion}-linux-arm64.tar.gz',
     );
-    file.writeAsStringSync('6');
-    // await unzipVSCodeIfNotExist();
-    // pseudoTerminal!.writeString('cd $libPath\n');
+    updateProgress(6);
     startVsCode(pseudoTerminal!);
   }
 

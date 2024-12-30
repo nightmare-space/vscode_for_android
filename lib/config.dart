@@ -1,7 +1,7 @@
 class Config {
   Config._();
 
-  /// 包名
+  /// The package name of the app
   static const String packageName = 'com.nightmare.code';
 
   static const String versionName = String.fromEnvironment('VERSION');
@@ -9,4 +9,6 @@ class Config {
   static int port = 20000;
 
   static const String defaultCodeServerVersion = String.fromEnvironment('CSVERSION');
+
+  static String ubuntu = 'ubuntu-jammy-aarch64-pd-v4.7.0.tar.xz';
 }
